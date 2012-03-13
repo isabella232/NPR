@@ -109,6 +109,7 @@ class Video{
 	
 	public function makeVideoBox(){
 	?>
+	<div class="item-wrapper">
 	<div class="sm-item item sm-video" id="<?php echo $this->identity;?>"> 
 		<div class="inner">
 			<div class='video-frame'>
@@ -129,6 +130,7 @@ class Video{
 				//echo UI::makePlayButton('#')?>
 			</div>
 		</div>
+	</div>
 	</div>
 	<script type="text/javascript">
 		 $(document).ready(function () {

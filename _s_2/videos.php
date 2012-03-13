@@ -5,11 +5,13 @@ if (isset($_GET['cat']))
 global $post;
 $PAGE_ID = $post -> ID;
 $url = get_bloginfo('url')."?page_id=$PAGE_ID";
+$loader = get_bloginfo('template_directory')."/loader_video.php";
 /**
  * Template name: Video Template
  */
 get_header();
 ?>
+<!-- before sidebar -->
 <div id="lh_sidebar">
 	<ul>
 		<?php $terms = get_terms("music-category","orderby=count&hide_empty=0");
@@ -21,6 +23,31 @@ get_header();
 		?>
 	</ul>
 </div>
+<!-- script starts -->
+<script type="text/javascript">
+// AJAX script 
+$(document).ready(function(){
+	
+	
+ $("#lh_sidebar li a").each(
+ 	function(){
+ 		var loader = '';
+ 		var name = $(this).attr("name");  
+ 		$(this).click(function(e){
+ 			e.preventDefault();
+ 			removeOtherClasses();
+ 			$(this).addClass("current");
+ 			window.location=$(this).attr("href");
+ 		});
+ 	});
+});
+function removeOtherClasses(){
+	$("#lh_sidebar li a").each(
+ 	function(){
+ 		$(this).removeClass("current");
+ 	});
+}
+</script>
 <div id="container">
 	<?php $videos = array();
 	$args = array('post_type' => 'wpsc-product' , 'numberposts' => 2000);
@@ -43,11 +70,10 @@ get_header();
 	?>
 
 </div>
-
 <script src="/npr/wp-content/themes/_s_2/js/masonry.js"></script>
 <script>
 var columnwidth = 242;
-var marginsize = 240;
+var marginsize = 200;
 	$(document).ready(function(){
 $('.sm-video').animate({
 opacity: 1 

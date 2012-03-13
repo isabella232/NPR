@@ -121,16 +121,21 @@ add_action( 'wp_enqueue_scripts', '_s_scripts' );
 
 /**
  * PROJECT BEGINS
- */
+ */ 
+
 add_theme_support( 'post-thumbnails' );
 add_image_size( 'homepage-thumb', 220, 180, true );
-add_image_size( 'video-thumb', 230, 160, true ); 
+add_image_size( 'article-thumb', 400, 180, false );
+add_image_size( 'video-thumb', 230, 200, true ); 
+add_image_size( 'related-thumb', 180, 120, true ); 
+add_image_size( 'full', 700, 420, true ); 
 include "php/video-class.php";
 include "php/ui-class.php";
 include "php/player-class.php";
+include "php/options.php";
 
 /**
- * add taxonomy to wpsc post type
+ * add taxonomy to wpsc post type 
  */
 register_taxonomy("music-category", "wpsc-product", array("hierarchical" => true, "label" => "Music Categories", "singular_label" => "Category", "rewrite" => true));   
 /**
@@ -166,7 +171,7 @@ function npr_meta_box(){
 	global $post;
 	//get the category
 	$terms = get_terms("wpsc_product_category");
-    add_meta_box("video-meta", "Video Information", "npr_video_meta_options", "wpsc-product", "side", "high");  
+    add_meta_box("video-meta", "Track Information", "npr_video_meta_options", "wpsc-product", "side", "high");  
 }    
   
 function npr_video_meta_options(){  
@@ -194,4 +199,56 @@ function npr_video_meta_options(){
 </table>
 <?php   
     } 
-?>
+
+/**
+ * AJAX
+ */
+add_action('wp_ajax_my_action', 'my_action_callback');
+
+function my_action_callback() {
+
+    echo "hello!!!!";
+
+	die(); // this is required to return a proper result
+}
+/**
+ * Menu 
+ */
+//add_action( 'init', 'register_navmenus' );
+ 
+function register_navmenus(){
+	
+	register_nav_menus( array(
+		'npr' => __( 'npr', '_s' ),
+	) );
+	if ( !is_nav_menu( 'npr' )) {
+        $menu_id = wp_create_nav_menu( 'npr' );
+        $menu = array( 'menu-item-type' => 'custom', 'menu-item-url' => get_home_url('/'),'menu-item-title' => 'JACK' );
+        wp_update_nav_menu_item( $menu_id, 0, $menu );
+    }
+	
+}
+
+/**
+ * excerpt size
+ */
+function wp_trim_all_excerpt($text) {
+// Creates an excerpt if needed; and shortens the manual excerpt as well
+global $post;
+  $raw_excerpt = $text;
+  if ( '' == $text ) {
+    $text = get_the_content('');
+    $text = strip_shortcodes( $text );
+    $text = apply_filters('the_content', $text);
+    $text = str_replace(']]>', ']]&gt;', $text);
+  }
+ 
+$text = strip_tags($text);
+$excerpt_length = apply_filters('excerpt_length', 10);
+$excerpt_more = apply_filters('excerpt_more', ' ' . '[...]');
+$text = wp_trim_words( $text, $excerpt_length, $excerpt_more ); //since wp3.3
+return apply_filters('wp_trim_excerpt', $text, $raw_excerpt); //since wp3.3
+}
+ 
+remove_filter('get_the_excerpt', 'wp_trim_excerpt');
+add_filter('get_the_excerpt', 'wp_trim_all_excerpt');

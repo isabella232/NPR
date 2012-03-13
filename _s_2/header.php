@@ -39,23 +39,44 @@
 <script src="<?php echo get_template_directory_uri(); ?>/js/html5.js" type="text/javascript"></script>
 <![endif]-->
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+<script type="text/javascript" src="<?php bloginfo('template_directory');?>/js/jQuery.jPlayer.2.1.0/jquery.jplayer.min.js"></script>
+<link type="text/css" REL=StyleSheet href="<?php bloginfo('template_directory');?>/js/jQuery.jPlayer.2.1.0/css/styles.css"/>
+<script type="text/javascript">
+	    $(document).ready(function(){
+	      $("#jquery_jplayer_1").jPlayer({
+	        ready: function () {
+	          $(this).jPlayer("setMedia", {
+	            m4a: "http://www.jplayer.org/audio/m4a/Miaow-07-Bubble.m4a",
+	            oga: "http://www.jplayer.org/audio/ogg/Miaow-07-Bubble.ogg"
+	          });
+	        },
+	        swfPath: "/js",
+	        supplied: "m4a, oga"
+	      });
+	    });
+	  </script>
 <?php wp_head(); ?>
-</head>
+</head> 
 
 <body <?php body_class(); ?>>
 <div id="page" class="hfeed site">
 	<?php do_action( 'before' ); ?>
 	<header id="masthead" class="site-header" role="banner">
 		<hgroup>
-			<h1 class="site-title"><a href="<?php echo home_url( '/' ); ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>" rel="home"><?php bloginfo( 'name' ); ?></a></h1>
-			<h2 class="site-description"><?php bloginfo( 'description' ); ?></h2>
+			<span class="site-title">
+				<a href="<?php echo home_url( '/' ); ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>" rel="home"><?php bloginfo( 'name' ); ?></a>
+				
+			</span>
+			<span class="site-description">
+				<?php bloginfo( 'description' ); ?>
+			</span>
 		</hgroup>
 
 		<nav role="navigation" class="site-navigation main-navigation">
 			<h1 class="assistive-text"><?php _e( 'Menu', '_s' ); ?></h1>
 			<div class="assistive-text skip-link"><a href="#content" title="<?php esc_attr_e( 'Skip to content', '_s' ); ?>"><?php _e( 'Skip to content', '_s' ); ?></a></div>
 
-			<?php wp_nav_menu( array( 'theme_location' => 'primary' ) ); ?>
+			<?php wp_nav_menu( ); ?>
 		</nav>
 	</header><!-- #masthead .site-header -->
 
