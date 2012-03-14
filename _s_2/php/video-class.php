@@ -109,9 +109,13 @@ class Video{
 	
 	public function makeVideoBox(){
 	?>
+	
 	<div class="item-wrapper">
 	<div class="sm-item item sm-video" id="<?php echo $this->identity;?>"> 
 		<div class="inner">
+			<?php
+			//print_r($this->post->wpsc-product-category);
+			?>
 			<div class='video-frame'>
 				<?php echo $this->getVideo();?>
 				<div class='video-minimize'>

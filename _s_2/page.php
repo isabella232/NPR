@@ -12,7 +12,7 @@
  */
 $product_category = $_GET['wpsc_product_category'];
 get_header(); ?>
-
+<!-- using page.php -->
 		<div id="primary" class="site-content">
 			<div id="content" role="main">
 

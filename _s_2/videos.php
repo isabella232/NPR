@@ -13,6 +13,12 @@ get_header();
 ?>
 <!-- before sidebar -->
 <div id="lh_sidebar">
+	<!-- ajax -->
+	<input type="hidden" name="GreetingAll" id="GreetingAll" value="Hello Everyone!" />  
+  <input type="submit" id="PleasePushMe" />  
+  <div id="test-div1">  
+  </div>
+  <!-- ajax -->
 	<ul>
 		<?php $terms = get_terms("music-category","orderby=count&hide_empty=0");
 		$count = count($terms);
@@ -50,30 +56,36 @@ function removeOtherClasses(){
 </script>
 <div id="container">
 	<?php $videos = array();
-	$args = array('post_type' => 'wpsc-product' , 'numberposts' => 2000);
-	$posts = get_posts($args);
-	foreach ($posts as $post) {
+	/** query products with category video */
+	$args = array('post_type' => 'wpsc-product' , 
+					'numberposts' => 2000, 
+					'wpsc_product_category'  => 'video');
+	$the_query = new WP_Query( $args );
+	while ( $the_query->have_posts() ) : $the_query->the_post();
+		
 		$current = new Video($post);
 		$videos[] = $current;
 		$post_cat_array = wp_get_post_terms($post->ID, 'music-category');
 		$display_it = false; 
 		foreach($post_cat_array as $cat)
 		{
-			if($cat->name == $CAT) 
+			if($cat->name == $CAT)  
 			{
 				$display_it = true;
 			}
 		}
 		if($display_it OR $CAT == "All")
 			$current->makeVideoBox();
-	}
+	endwhile;
+	
+	
 	?>
 
 </div>
 <script src="/npr/wp-content/themes/_s_2/js/masonry.js"></script>
 <script>
 var columnwidth = 242;
-var marginsize = 200;
+var marginsize = 230;
 	$(document).ready(function(){
 $('.sm-video').animate({
 opacity: 1 

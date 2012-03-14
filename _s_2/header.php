@@ -41,20 +41,7 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
 <script type="text/javascript" src="<?php bloginfo('template_directory');?>/js/jQuery.jPlayer.2.1.0/jquery.jplayer.min.js"></script>
 <link type="text/css" REL=StyleSheet href="<?php bloginfo('template_directory');?>/js/jQuery.jPlayer.2.1.0/css/styles.css"/>
-<script type="text/javascript">
-	    $(document).ready(function(){
-	      $("#jquery_jplayer_1").jPlayer({
-	        ready: function () {
-	          $(this).jPlayer("setMedia", {
-	            m4a: "http://www.jplayer.org/audio/m4a/Miaow-07-Bubble.m4a",
-	            oga: "http://www.jplayer.org/audio/ogg/Miaow-07-Bubble.ogg"
-	          });
-	        },
-	        swfPath: "/js",
-	        supplied: "m4a, oga"
-	      });
-	    });
-	  </script>
+
 <?php wp_head(); ?>
 </head> 
 

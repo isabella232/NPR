@@ -3,41 +3,46 @@
  * Template name: Homepage Template
  */
 get_header(); ?>
-<div id="slider-wrapper">
-<div id="article-slider">
-	<?php
+<h1 class='homepage-indent'><p>Articles</p></h1>
+<div>
+	<div id="slider-wrapper">
+		<div id="article-slider">
+			<?php
 	
 	$args = array(
     'numberposts'     => 5,
     'post_status'     => 'publish' ); 
 	$posts = get_posts($args);
 	foreach($posts as $post){
-		?>
-		<div class="sm-item item article-item">
-			<div class="inner">
-		<div class="content">
-	    <h4><a href="<?php if(get_post_meta($post->ID, "url", true)) echo get_post_meta($post->ID, "url", true); else the_permalink(); ?>">Articles</a></h4>
-	    </div>  
-	      <?php 
-	      the_post_thumbnail( 'article-thumb' ); 
-	     
-	      ?>
-	      <div class="content">
-	      	<?php
-	      	$content = $post->post_content;
-			$content = apply_filters('the_content', $content);
-			$content = substr($content, 0 , min(strlen($content),60))."...";
-			echo $content;
+
 			?>
-	      
-		   </div>     
-		     </div>          
-	  	</div>
-  <?php
-	 
-	}
-	?>
-</div>
+			<div class="sm-item item article-item">
+				<div class="inner">
+					  
+					<div class="content title">
+						<h4><a href="<?php if(get_post_meta($post->ID, "url", true)) echo get_post_meta($post->ID, "url", true); else the_permalink(); ?>">Articles</a></h4>
+					</div>
+			
+					
+					<?php
+					the_post_thumbnail( 'article-thumb' );
+					?>
+					<div class="content">
+						<?php
+						$content = $post->post_content;
+						$content = apply_filters('the_content', $content);
+						$content = substr($content, 0 , min(strlen($content),60))."...";
+						echo $content;
+						?>
+					</div>
+				</div>
+			</div>
+			<?php
+
+}
+			?>
+		</div>
+	</div>
 </div>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
 <script src="http://bxslider.com/sites/default/files/jquery.bxSlider.min.js" type="text/javascript"></script>
@@ -56,7 +61,6 @@ get_header(); ?>
   	var h = getSliderHeight();
     $(".bx-window").width(w); 
     $(".bx-wrapper").width(w); 
-    
     $(".bx-next").appendTo("#slider-wrapper");
     $(".bx-prev").prependTo("#slider-wrapper");
     $(".bx-prev").height(h);

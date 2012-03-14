@@ -1,6 +1,38 @@
 <?php
+class track{
+	public $guid;
+	public $title;
+	public $ID;
+}
+
 class player {
-	public static function getPlayer() {
+	public static function getPlayer(){
+		//wpsc_add_mp3_preview();
+		self::getPlayer2(); 
+	}
+	
+	
+	public static function getPlayer2() {
+		$tracks = array();
+		//get the files
+		$args = array(
+		'post_status' => 'inherit',
+		'post_type' => 'wpsc-preview-file'
+		);
+		$count = 0 ;
+		$file_data = get_posts($args);
+		foreach($file_data as $file){
+			//echo "guid = ".$file->guid;
+			$current = new track();
+			$current->guid = $file->guid; 
+			$current->title = "Track Name";
+			$current->ID = $count;
+			$count++;
+			$tracks[] = $current;
+		}
+		
+		
+		
 		echo '
 		<div id="player-wrapper">
 		<div id="jp_screen">
@@ -63,6 +95,25 @@ class player {
 	</div><!--end jp_container_1-->
 	</div>
 		';
+		
+		
+	?>
+	
+ 	<script type="text/javascript">
+	    $(document).ready(function(){
+	      $("#jquery_jplayer_1").jPlayer({
+	        ready: function () { 
+	          $(this).jPlayer("setMedia", {
+	          	mp3: <?php echo $tracks[0]->guid; ?>
+	          });
+	        },
+	        swfPath: "/js",
+	        supplied: "mp3"
+	      });
+	    });
+	</script>
+	
+	<?php
 	}
 
 }

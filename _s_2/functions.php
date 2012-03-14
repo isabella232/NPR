@@ -133,6 +133,7 @@ include "php/video-class.php";
 include "php/ui-class.php";
 include "php/player-class.php";
 include "php/options.php";
+include "php/jplayer/jplayer.php";
 
 /**
  * add taxonomy to wpsc post type 
@@ -161,10 +162,37 @@ function npr_save_product_meta(){
         update_post_meta($post->ID, "video-meta-release", $_POST["video-meta-release"]);  
     }  
 }
+add_action('save_post', 'npr_save_album_meta');   
+
+function npr_save_album_meta(){  
+    global $post;    
+  		
+    if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ){  
+        return $post_id;  
+    }else{  
+        update_post_meta($post->ID, "video-meta-embed", $_POST["video-meta-embed"]);  
+        update_post_meta($post->ID, "video-meta-track", $_POST["video-meta-track"]);  
+        update_post_meta($post->ID, "video-meta-artists", $_POST["video-meta-artists"]);  
+        update_post_meta($post->ID, "video-meta-album", $_POST["video-meta-album"]);  
+        update_post_meta($post->ID, "video-meta-release", $_POST["video-meta-release"]);  
+    }  
+}
 
 /**
  * Add metaboxes
  */
+add_action("admin_init", "npr_album_box");     
+  
+function npr_album_box(){
+	global $post; 
+	//get the category
+	$terms = get_terms("wpsc_product_category");
+    add_meta_box("video-meta", "Track Information", "npr_video_meta_options", "wpsc-product", "side", "high");  
+}    
+  
+ 
+ 
+ 
 add_action("admin_init", "npr_meta_box");     
   
 function npr_meta_box(){
@@ -200,17 +228,7 @@ function npr_video_meta_options(){
 <?php   
     } 
 
-/**
- * AJAX
- */
-add_action('wp_ajax_my_action', 'my_action_callback');
 
-function my_action_callback() {
-
-    echo "hello!!!!";
-
-	die(); // this is required to return a proper result
-}
 /**
  * Menu 
  */
@@ -252,3 +270,5 @@ return apply_filters('wp_trim_excerpt', $text, $raw_excerpt); //since wp3.3
  
 remove_filter('get_the_excerpt', 'wp_trim_excerpt');
 add_filter('get_the_excerpt', 'wp_trim_all_excerpt');
+
+
