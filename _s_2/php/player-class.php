@@ -1,5 +1,5 @@
 <?php
-class track{
+class player_track{
 	public $guid;
 	public $title;
 	public $ID;
@@ -13,7 +13,7 @@ class player {
 	
 	
 	public static function getPlayer2() {
-		$tracks = array();
+		$player_tracks = array();
 		//get the files
 		$args = array(
 		'post_status' => 'inherit',
@@ -23,12 +23,12 @@ class player {
 		$file_data = get_posts($args);
 		foreach($file_data as $file){
 			//echo "guid = ".$file->guid;
-			$current = new track();
+			$current = new player_track();
 			$current->guid = $file->guid; 
-			$current->title = "Track Name";
+			$current->title = "player_track Name";
 			$current->ID = $count;
 			$count++;
-			$tracks[] = $current;
+			$player_tracks[] = $current;
 		}
 		
 		
@@ -36,7 +36,7 @@ class player {
 		echo '
 		<div id="player-wrapper">
 		<div id="jp_screen">
-				<h3 class="track">Track: The Beat</h3>
+				<h3 class="player_track">player_track: The Beat</h3>
 				<h3 class="artist">Artist: Jack Mahoney</h3>
 		</div>
 		<!--container for everything-->
@@ -104,7 +104,7 @@ class player {
 	      $("#jquery_jplayer_1").jPlayer({
 	        ready: function () { 
 	          $(this).jPlayer("setMedia", {
-	          	mp3: <?php echo $tracks[0]->guid; ?>
+	          	mp3: <?php echo $player_tracks[0]->guid; ?>
 	          });
 	        },
 	        swfPath: "/js",

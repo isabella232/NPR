@@ -170,11 +170,7 @@ function npr_save_album_meta(){
     if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ){  
         return $post_id;  
     }else{  
-        update_post_meta($post->ID, "video-meta-embed", $_POST["video-meta-embed"]);  
-        update_post_meta($post->ID, "video-meta-track", $_POST["video-meta-track"]);  
-        update_post_meta($post->ID, "video-meta-artists", $_POST["video-meta-artists"]);  
-        update_post_meta($post->ID, "video-meta-album", $_POST["video-meta-album"]);  
-        update_post_meta($post->ID, "video-meta-release", $_POST["video-meta-release"]);  
+        update_post_meta($post->ID, "album-meta-name", $_POST["album-meta-name"]);  
     }  
 }
 
@@ -187,11 +183,9 @@ function npr_album_box(){
 	global $post; 
 	//get the category
 	$terms = get_terms("wpsc_product_category");
-    add_meta_box("video-meta", "Track Information", "npr_video_meta_options", "wpsc-product", "side", "high");  
+    add_meta_box("album-meta", "Album Information", "npr_album_meta_options", "wpsc-product", "side", "high");  
 }    
   
- 
- 
  
 add_action("admin_init", "npr_meta_box");     
   
@@ -202,6 +196,20 @@ function npr_meta_box(){
     add_meta_box("video-meta", "Track Information", "npr_video_meta_options", "wpsc-product", "side", "high");  
 }    
   
+function npr_album_meta_options(){  
+        global $post;  
+        if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ) return $post_id;  
+        $custom = get_post_custom($post->ID);  
+       
+?>  
+<table>
+	<tr>
+    	<td><label>Album Name:</label></td><td><input name="album-meta-name" value="<?php echo ($custom["album-meta-name"][0]); ?>" /></td>
+    </tr>
+</table>
+<?php   
+    } 
+
 function npr_video_meta_options(){  
         global $post;  
         if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ) return $post_id;  
