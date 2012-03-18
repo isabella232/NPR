@@ -15,14 +15,14 @@ class Video{
 	public function __construct($post){
 		$this->post = $post;
 		$this->identity = "video-".$post->ID;
-		$custom = get_post_custom($post->ID);
-		$this->categories = get_terms("wpsc-product-category");
-		$this->category = $this->categories->name;
-		$this->embed = $custom["video-meta-embed"][0];
-		$this->artists = $custom["video-meta-artists"][0];
-		$this->track = $custom["video-meta-track"][0];
-		$this->album = $custom["video-meta-album"][0];
-		$this->release = $custom["video-meta-release"][0];
+			$custom = get_post_custom($post->ID);
+			$this->categories = get_terms("wpsc-product-category");
+			$this->category = $this->categories->name;
+			$this->embed = $custom["video-meta-embed"][0];
+			$this->artists = $custom["video-meta-artists"][0];
+			$this->track = $custom["video-meta-track"][0];
+			$this->album = $custom["video-meta-album"][0];
+			$this->release = $custom["video-meta-release"][0];
 	}	
 	
 	public function getCategories(){

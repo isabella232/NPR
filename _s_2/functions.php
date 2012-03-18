@@ -126,6 +126,7 @@ add_action( 'wp_enqueue_scripts', '_s_scripts' );
 add_theme_support( 'post-thumbnails' );
 add_image_size( 'homepage-thumb', 220, 180, true );
 add_image_size( 'article-thumb', 400, 180, false );
+add_image_size( 'album-thumb', 200, 200, false );
 add_image_size( 'video-thumb', 230, 200, true ); 
 add_image_size( 'related-thumb', 180, 120, true ); 
 add_image_size( 'full', 700, 420, true ); 
@@ -133,12 +134,15 @@ include "php/video-class.php";
 include "php/ui-class.php";
 include "php/player-class.php";
 include "php/options.php";
+include "php/dbhelper.php";
 include "php/jplayer/jplayer.php";
 
 /**
  * add taxonomy to wpsc post type 
  */
+register_taxonomy("music-artist", "wpsc-product", array("hierarchical" => true, "label" => "Artists", "singular_label" => "Category", "rewrite" => true));   
 register_taxonomy("music-category", "wpsc-product", array("hierarchical" => true, "label" => "Music Categories", "singular_label" => "Category", "rewrite" => true));   
+
 /**
  * add custom fields
  */
@@ -154,12 +158,14 @@ function npr_save_product_meta(){
   		
     if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ){  
         return $post_id;  
-    }else{  
+    }else{
+    	update_post_meta($post->ID, "video-meta-release", $_POST["video-meta-release"]);    
         update_post_meta($post->ID, "video-meta-embed", $_POST["video-meta-embed"]);  
         update_post_meta($post->ID, "video-meta-track", $_POST["video-meta-track"]);  
         update_post_meta($post->ID, "video-meta-artists", $_POST["video-meta-artists"]);  
+        update_post_meta($post->ID, "video-meta-length", $_POST["video-meta-length"]);  
         update_post_meta($post->ID, "video-meta-album", $_POST["video-meta-album"]);  
-        update_post_meta($post->ID, "video-meta-release", $_POST["video-meta-release"]);  
+
     }  
 }
 add_action('save_post', 'npr_save_album_meta');   
@@ -174,7 +180,7 @@ function npr_save_album_meta(){
     }  
 }
 
-/**
+/** 
  * Add metaboxes
  */
 add_action("admin_init", "npr_album_box");     
@@ -204,7 +210,25 @@ function npr_album_meta_options(){
 ?>  
 <table>
 	<tr>
-    	<td><label>Album Name:</label></td><td><input name="album-meta-name" value="<?php echo ($custom["album-meta-name"][0]); ?>" /></td>
+    	<?php /**<td><label>Album Name:</label></td><td><input name="album-meta-name" value="<?php echo ($custom["album-meta-name"][0]); ?>" /></td> */?>
+    	<td>
+    		<select name="album-meta-name">
+    			<?php
+    			$albums = DBHelper::getAlbumsOnly();
+				foreach($albums as $album){
+					echo "<option value='$album->name'";
+					if($album->name == $custom["album-meta-name"][0])
+						echo "selected='selected'";
+					echo ">$album->name</option>";					
+				}
+    			?>
+    		</select>
+    	</td>
+    </tr>
+    <tr>
+    	<td>
+    		<p>Add Album products of the category 'Album' and attach individual tracks to them above</p>
+    	</td>
     </tr>
 </table>
 <?php   
@@ -222,6 +246,9 @@ function npr_video_meta_options(){
     </tr>
 	<tr>
     	<td><label>Track:</label></td><td><input name="video-meta-track" value="<?php echo $custom["video-meta-track"][0]; ?>" /></td>
+    </tr>
+	<tr>
+    	<td><label>Length:</label></td><td><input name="video-meta-length" value="<?php echo $custom["video-meta-length"][0]; ?>" /></td>
     </tr>
     <tr> 
     	<td><label>Artists:</label></td><td><input name="video-meta-artists" value="<?php echo $custom["video-meta-artists"][0]; ?>" /></td> 

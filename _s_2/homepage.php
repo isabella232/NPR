@@ -18,11 +18,7 @@ get_header(); ?>
 			?>
 			<div class="sm-item item article-item">
 				<div class="inner">
-					  
-					<div class="content title">
-						<h4><a href="<?php if(get_post_meta($post->ID, "url", true)) echo get_post_meta($post->ID, "url", true); else the_permalink(); ?>">Articles</a></h4>
-					</div>
-			
+		
 					
 					<?php
 					the_post_thumbnail( 'article-thumb' );

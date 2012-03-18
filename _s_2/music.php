@@ -28,11 +28,14 @@ class album{
 			<div>
 			<h1>title = $this->name</h1>";
 			echo get_the_post_thumbnail($this->ID);
-			$this->getTrackList();
-		echo "</div>";
+			$this->displayTrackList();
+           	echo "</div>";
 	}
-	
-	public function getTrackList(){
+	/**
+     * iterate the tracks and echo each track
+     * @return string
+     */
+	public function displayTrackList(){
 		echo "<ul>";
 		foreach($this->tracks as $track){
 			echo "<li>";
@@ -40,7 +43,8 @@ class album{
 			echo "</li>";
 		}
 		echo "</ul>";
-	} 
+        return "yo";
+	}
 }
 class track{
 	public $name;
