@@ -307,3 +307,35 @@ remove_filter('get_the_excerpt', 'wp_trim_excerpt');
 add_filter('get_the_excerpt', 'wp_trim_all_excerpt');
 
 
+/**
+ * AJAX
+ */
+wp_enqueue_script('jquery');
+/**
+ * returns the full view for an album
+ */
+function fetchAlbum(){
+	
+	$id = $_POST['id'];
+	if($id!=''){
+	$album = DBHelper::getAlbum($id);
+	$view = $album->getFullView(false);
+	echo str_replace("\'", "\"", $view);
+	}
+die();
+}
+add_action('wp_ajax_fetchAlbum', 'fetchAlbum');
+add_action('wp_ajax_nopriv_fetchAlbum', 'fetchAlbum');
+
+function displayAlbums(){
+	$genre = $_POST['genre'];
+	$artist = $_POST['artist'];
+	$albums = DBHelper::getAlbums($genre, $artist);
+	foreach($albums as $album){
+		$album->makeView();
+	}
+	
+die();
+}
+add_action('wp_ajax_displayAlbums', 'displayAlbums');
+add_action('wp_ajax_nopriv_displayAlbums', 'displayAlbums');

@@ -2,108 +2,29 @@
 /**
  * Template name: Music Template
  */
-function jbug($var){
-	echo "<pre>";
-	var_dump($var); 
-	echo "</pre>"; 
-}
- 
-class album{
-	public $tracks;
-	public $name; 
-	public $ID;
-	
-	public function __construct($name, $ID){
-		$this->name = $name; 
-		$this->ID = $ID;
-		$tracks = array();
-	}
-	
-	public function addTrack($track){
-		$this->tracks[] = $track;
-	}
-	
-	public function makeView(){
-		echo "
-			<div>
-			<h1>title = $this->name</h1>";
-			echo get_the_post_thumbnail($this->ID);
-			$this->displayTrackList();
-           	echo "</div>";
-	}
-	/**
-     * iterate the tracks and echo each track
-     * @return string
-     */
-	public function displayTrackList(){
-		echo "<ul>";
-		foreach($this->tracks as $track){
-			echo "<li>";
-			echo $track->name;
-			echo "</li>";
-		}
-		echo "</ul>";
-        return "yo";
-	}
-}
-class track{
-	public $name;
-	public $album;
-	public $ID;
-	
-	public function __construct($name, $ID){
-		$this->name = $name; 
-		$this->ID = $ID;
-	}
-}
+
 // echo "<br/><br/><br/><br/>";
-$tracks = array();
-$albums = array();
-	//query albums
-	$args = array('post_type' => 'wpsc-product' , 'numberposts' => 2000, 'wpsc_product_category'  => 'album');
-	$the_query = new WP_Query( $args );
-	//iterate albums
-	while ( $the_query->have_posts() ) : 
-		$the_query->the_post();
-		$product_cat = $the_query->query_vars['wpsc_product_category'];
-		$current = new album(get_the_title(), get_the_ID()); // create album with that name
-		$albums[] = $current; // add to albums
-	endwhile;
-	
-	//query tracks
-	$args = array('post_type' => 'wpsc-product' , 'numberposts' => 2000, 'wpsc_product_category'  => 'track');
-	$the_query = new WP_Query( $args );
-	//iterate tracks
-	while ( $the_query->have_posts() ) : 
-		$the_query->the_post();
-		$product_cat = $the_query->query_vars['wpsc_product_category'];
-		$current = new track(get_the_title(), get_the_ID()); // create track with that name
-		$meta = get_post_meta($current->ID, 'album-meta-name');
-		$current->album = $meta[0];
-		$tracks[] = $current; // add to track array
-	endwhile;
-	//iterate tracks and add them to the albums array
-	foreach($tracks as $track){
-		foreach($albums as $album){
-			if($album->name = $track->album)
-			$album->addTrack($track);
-		}
-	}
+
  
  
 get_header(); ?>
 <div id="lh_sidebar">
 	<ul>
 		<?php 
-		$labels = array('All','Hip Hop','Rock','Country','Up & Coming');
-		foreach($labels as $label){
-			echo "<li><a href='#'>$label</a></li>";
-		}
+		echo "<div id='genre-tax'>";
+		echo "<h2>Genres</h2>";
+		DBHelper::getTaxonomyList('album','music-category');
+		echo "</div>";
+		echo "<div id='artist-tax'>";
+		echo "<h2>Artists</h2>";
+		DBHelper::getTaxonomyList('album','music-artist');
+		echo "</div>"
+	
 		?>
 	</ul>
 </div>
 <div id="container">
-	
+	 
 		<div class="product_grid_display group">
 		
 		</div>
@@ -112,11 +33,131 @@ get_header(); ?>
 	/**
 	 *  DISPLAY RESULTS OF MUSIC SEARCH
 	 */
+	$albums = DBHelper::getAlbums(); 
 	foreach($albums as $album){
 		$album->makeView();
 	}
 	
 	
 ?>
+<script>  
+
+/**
+ * reposition fullview on resize
+ */
+$(window).resize(function(){
+		setUpFullView();
+	});
+			
+var fullOpen = false;
+/**
+ * show a full view
+ */		
+function showThis(id){
+	if(fullOpen == false){
+		ajaxSubmit(id);
+	}
+	fullOpen = true;
 	
+}
+
+$("#artist-tax li a").click(function(e){
+	e.preventDefault();
+	var value = $(this).text();
+	ajaxLoadAlbums('null',value);
+});
+$("#genre-tax li a").click(function(e){
+	e.preventDefault();
+	var value = $(this).text();
+	ajaxLoadAlbums(value,'null');
+});
+/**
+ * make ajax call to load a series of albums
+ */
+function ajaxLoadAlbums(genre,artist){
+				if(genre!=""){
+					showAjaxLoader();
+					$.ajax({
+			        url:        '<?php echo get_bloginfo('url')?>/wp-admin/admin-ajax.php',
+			        type:       'post',
+			        data:       { "action":"displayAlbums", "artist":artist , "genre":genre},
+			        success: function(data) {
+			        $("#container").html("");
+				    $("#container").append(data);
+					hideAjaxLoader();
+				  }
+			    });				  
+				}
+				return false;
+} 
+/**
+ * make ajax call to load full view for album
+ */
+function ajaxSubmit(id){
+				if(id!=""){
+					showAjaxLoader();
+					$.ajax({
+			        url:        '<?php echo get_bloginfo('url')?>/wp-admin/admin-ajax.php',
+			        type:       'post',
+			        data:       { "action":"fetchAlbum", "id":id},
+			        success: function(data) {
+				    $("#container").append(data);
+					setUpFullView();
+					hideAjaxLoader();
+				  }
+			    });				  
+				}
+				return false;
+} 
+/**
+ * position the full view and make div heights match
+ */
+function setUpFullView(){
+	
+	var position = ( $("#container").width() )/ 2;
+	
+	position = position - ( ($(".large-item").width() )/2 );
+	$(".large-item").css("margin-left",position+"px");
+	var rightH = $(".right-bar").height();
+	var leftH = $(".left-bar").height();
+	var H = Math.max(rightH,leftH);
+	$(".right-bar").height(H);
+	$(".left-bar").height(H);
+	$(".large-item .close").click(restoreAlbums);
+} 
+/**
+ * remove full view and restore albums
+ */
+function restoreAlbums(){
+	fullOpen = false;
+	$(".large-item").remove();
+	$("#container div").each(
+		function(){
+			$(this).fadeIn('200');
+		}
+	);
+}			
+
+
+$(document).ready(function(){
+	var w = $(window).width() - 240;
+  $('#container').width(w);
+	arrange();
+});
+
+$(window).resize(function() {
+	var w = $(window).width() - 240;
+  $('#container').width(w);
+	arrange();
+});	
+
+function arrange(){
+  $('#container').masonry({
+    // options
+    itemSelector : '.item',
+    columnWidth : 244,
+    isAnimated: true
+  });
+}
+</script>	
 <?php get_footer(); ?>

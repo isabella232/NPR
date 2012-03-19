@@ -39,6 +39,17 @@
 <script src="<?php echo get_template_directory_uri(); ?>/js/html5.js" type="text/javascript"></script>
 <![endif]-->
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+<script>
+	$(document).ready(function(){
+		$("body").append("<div id='ajaxloaderdiv'></div>");
+	});
+	function showAjaxLoader(){
+		$("#ajaxloaderdiv").show();
+	}
+	function hideAjaxLoader(){
+		$("#ajaxloaderdiv").hide();
+	}
+</script>
 <script type="text/javascript" src="<?php bloginfo('template_directory');?>/js/jQuery.jPlayer.2.1.0/jquery.jplayer.min.js"></script>
 <link type="text/css" REL=StyleSheet href="<?php bloginfo('template_directory');?>/js/jQuery.jPlayer.2.1.0/css/styles.css"/>
 
