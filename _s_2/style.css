@@ -498,7 +498,9 @@ body {
 	font-weight: normal;
 }
 #lh_sidebar li a.current {
-	color: white;
+	color: black;
+	background: white;
+	padding-right: 0px;
 }
 #lh_sidebar li a:hover {
 	color: #000;
@@ -1160,4 +1162,5 @@ cursor: pointer;
 }
 .track-list tr:hover{
 	background:#666;
+	cursor:pointer;
 }

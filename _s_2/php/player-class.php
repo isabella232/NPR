@@ -3,6 +3,7 @@ class player_track{
 	public $guid;
 	public $title;
 	public $ID;
+	public $parent;
 }
 
 class player {
@@ -13,25 +14,6 @@ class player {
 	
 	
 	public static function getPlayer2() {
-		$player_tracks = array();
-		//get the files
-		$args = array(
-		'post_status' => 'inherit',
-		'post_type' => 'wpsc-preview-file'
-		);
-		$count = 0 ;
-		$file_data = get_posts($args);
-		foreach($file_data as $file){
-			//echo "guid = ".$file->guid;
-			$current = new player_track();
-			$current->guid = $file->guid; 
-			$current->title = "player_track Name";
-			$current->ID = $count;
-			$count++;
-			$player_tracks[] = $current;
-		}
-		
-		
 		
 		echo '
 		<div id="player-wrapper">
@@ -104,13 +86,38 @@ class player {
 	      $("#jquery_jplayer_1").jPlayer({
 	        ready: function () { 
 	          $(this).jPlayer("setMedia", {
-	          	mp3: <?php echo $player_tracks[0]->guid; ?>
+	          	mp3: '<?php echo $player_tracks[0]->guid; ?>'
 	          });
 	        },
 	        swfPath: "/js",
 	        supplied: "mp3"
 	      });
 	    });
+	    
+	    function updatePlayer(name, artist, guid){
+	    	var player = $("#jquery_jplayer_1");
+	    	lcdTrack = $("#jp_screen .player_track"); //the track display
+	    	lcdArtist = $("#jp_screen .artist"); //the artist display
+	    	lcdTrack.html("Track: "+name);
+	    	lcdArtist.html("Artists: "+artist);
+	    	$("#jquery_jplayer_1").jPlayer({
+	        ready: function () { 
+	          $(this).jPlayer("setMedia", { 
+	          	mp3: guid
+	          	
+	          }); 
+	          $(this).jPlayer("play", 0);
+	        },
+	        swfPath: "/js",
+	        supplied: "mp3",
+	    
+	      }); 
+	       $("#jquery_jplayer_1").jPlayer("setMedia", { 
+	          	mp3: guid
+	          	
+	          }); 
+	          $("#jquery_jplayer_1").jPlayer("play", 0);
+	    }
 	</script>
 	
 	<?php

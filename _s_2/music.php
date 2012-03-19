@@ -33,6 +33,8 @@ get_header(); ?>
 	/**
 	 *  DISPLAY RESULTS OF MUSIC SEARCH
 	 */
+		
+	
 	$albums = DBHelper::getAlbums(); 
 	foreach($albums as $album){
 		$album->makeView();
@@ -64,13 +66,26 @@ function showThis(id){
 $("#artist-tax li a").click(function(e){
 	e.preventDefault();
 	var value = $(this).text();
+	removeCurrentClass();
+	$(this).addClass("current");
 	ajaxLoadAlbums('null',value);
 });
 $("#genre-tax li a").click(function(e){
 	e.preventDefault();
 	var value = $(this).text();
+	removeCurrentClass();
+	$(this).addClass("current");
 	ajaxLoadAlbums(value,'null');
 });
+
+function removeCurrentClass(){
+	var elems = new Array("#artist-tax li a","#genre-tax li a");
+	var i = 0;
+	for(i = 0 ; i < elems.length ; i ++ )
+	$(elems[i]).each(function(){
+		$(this).removeClass("current");
+	});
+}
 /**
  * make ajax call to load a series of albums
  */
@@ -154,7 +169,7 @@ $(window).resize(function() {
 function arrange(){
   $('#container').masonry({
     // options
-    itemSelector : '.item',
+    itemSelector : '.item-wrapper',
     columnWidth : 244,
     isAnimated: true
   });

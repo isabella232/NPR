@@ -136,6 +136,7 @@ include "php/player-class.php";
 include "php/options.php";
 include "php/dbhelper.php";
 include "php/jplayer/jplayer.php";
+include "php/nprwidgets/npr_shopping_cart_widget.php";
 
 /**
  * add taxonomy to wpsc post type 

@@ -15,6 +15,9 @@
 		<div class="site-info">
 			<?php player::getPlayer(); ?>
 		</div><!-- .site-info -->
+		<?php
+		CartHelper::getCart();
+		?>
 	</footer><!-- .site-footer .site-footer -->
 </div><!-- #page .hfeed .site -->
 
