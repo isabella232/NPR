@@ -9,7 +9,7 @@ $loader = get_bloginfo('template_directory')."/loader_video.php";
 /**
  * Template name: Video Template
  */
-get_header();
+UI::ajaxheader();
 ?>
 <!-- before sidebar -->
 <div id="lh_sidebar">
@@ -107,7 +107,7 @@ arrange();
 function arrange(){
 $('#container').masonry({
 // options
-itemSelector : '.item',
+itemSelector : '.item-wrapper',
 columnWidth : columnwidth,
 isAnimated: true
 });
@@ -120,4 +120,4 @@ window.location.href="<?php echo bloginfo('url') . "?page_id=" . $PAGE_ID;?>
 
 	}
 </script>
-<?php get_footer();?>
+<?php UI::ajaxfooter();?>

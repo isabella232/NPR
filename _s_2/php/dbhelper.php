@@ -1,250 +1,24 @@
 <?php
-function jbug($var) {
-	echo "<pre>";
-	var_dump($var);
-	echo "</pre>";
-}
 
-class album {
-	public $tracks;
-	public $name;
-	public $ID;
-	public $domID;
-	public $fulldomID;
-	public $permalink;
-	public $thumbnail;
-	public $categories;
-	public $artists;
-	public $released;
-	public function __construct($name, $ID) {
-		$this -> name = $name;
-		$this -> ID = $ID;
-		$this -> domID = str_replace(" ", '', ($this -> name . $this -> ID));
-		$this -> fulldomID = $this -> domID . "full";
-		$this -> permalink = get_permalink($this->ID);
-		$this->thumbnail = get_the_post_thumbnail($this -> ID, "album-thumb");
-		$this->categories = wp_get_post_terms($this->ID, 'music-category', array("fields" => "all"));
-		$terms = wp_get_post_terms($this->ID, 'music-artist', array("fields" => "all"));
-		$this->artists = $terms;
-		$tracks = array();
-		
-		$custom = get_post_custom($this->ID);
-		$released = $custom["video-meta-release"][0]; 
-	}
 
-	public function addTrack($track) {
-		$this -> tracks[] = $track;
-	}
-	
-	public function getCategories(){
-		$str = "";
-		$count =0;
-		foreach($this->categories as $category){
-			if($count>0)
-			$str.= ", ";
-			$str.= "<a href='#'>".$category->name."</a>";
-			$count++;			
-		}
-		return $str;
-	}
-	
-	public function getArtists(){
-		$str = '';
-		$count = 0;
-		foreach($this->artists as $artist){
-			if($count>0)
-				$str.=", ";
-			$str.="$artist->name";
-			$count++;
-		} 
-		return $str;
-	}
-
-	public function makeView() {
-		echo "
-			<div class='item-wrapper' id='$this->domID'>
-			<div class='sm-item item album-item'>
-			<div class='inner'>
-			<div class='content'>
-	    		<h4><a href='$this->permalink'>$this->name</a></h4>
-	    	</div> 
-			";
-		echo $this->thumbnail;
-		
-		echo "</div>
-			  </div>
-		      </div>";
-	    $this->getScripts();
-	}
-	
-	public function getFullView($echo = true){
-		$image = str_replace("\"","\'",$this->thumbnail);
-		$categories = $this->getCategories();
-		$artists = $this->getArtists();
-		$trackCount = count($this->tracks);
-		$buynow = CartHelper::getBuyNow($this->ID);
-		
-		$view = "
-		<div class='large-item' id='$this->fulldomID'>
-			<div class='close'></div>
-			<div class='large-item-inner'>
-				<div class='left-bar'>
-					<h2>$this->name</h2>
-					<div class='album-art'>
-					$image
-					</div>
-					<table class='full-album-meta'>
-			
-					<tr> 
-					 <td class='header'>Artists</td>
-					 <td class='clickable'>$artists</td>
-					</tr>
-				    <tr> 
-					 <td class='header'>Released</td>
-					 <td class='clickable'>$this->released</td>
-					</tr>
-					<tr>
-					 <td class='header'>Genres</td>
-					 <td class='clickable'>$categories</td>
-					</tr>
-					<tr>
-					 <td class='header'>Tracks</td>
-					 <td class='clickable'>$trackCount</td>
-					</tr>
-					</table>
-					$buynow
-				</div>
-				<div class='right-bar'>";
-				$view.= $this->getTrackList();	 
-				$view.="</div>
-			</div>			
-		</div>
-		"; 	
-		if($echo)
-			echo  trim( preg_replace( '/\s+/', ' ', $view ) );
-		else
-			return  trim( preg_replace( '/\s+/', ' ', $view ) );
-	}
-	
-	public function getScripts(){
-		?>
-		<script>
-		
-		
-			$(document).ready(function(){
-				var holder = "#<?php echo $this->domID; ?>";
-				$(holder+"").click(function(e){
-					e.preventDefault();
-					ajaxSubmit();
-					$("#container div").each(
-					function(){
-						$(this).fadeOut('200',function(){
-							showThis("<?php echo $this->ID ?>");
-						});
-						}
-					);
-				});
-				
-				  
-				
-								
-			});
-			
-		 
-		</script>
-		<?php;
-	}
-
-	public function getTrackList() {
-		$list = "";
-		if ($this -> tracks != NULL)
-		{
-		$list.= "<table class='track-list'>";
-		$list.= "<th>Track</th>"; 
-		$list.= "<th>Length</th>";
-		$list.= "<th>Artists</th>";
-		$list.= "<th>Purchase</th>";
-		$list.= "</tr>";
-		
-			$count = 0;
-			foreach ($this->tracks as $track) {
-				$artists = $track->printArtists();
-				$class = "odd";
-				$buynow = CartHelper::getBuyNow($track->ID);
-				if($count%2==0)
-					$class = "even";
-				$list.= "<tr class='$class' id='$track->domID'>";
-				$list.= "<td class='clickable'>$track->name</td>";
-				$list.= "<td class='clickable'>$track->length</td>";
-				$list.= "<td class='clickable'>$artists</td>";
-				$list.= "<td class='productcol'>$buynow</td>";
-				$list.= "</tr>";
-				$list.= $track->getPlayerScript();
-				$count++;
-			}
-		
-		$list.= "</table>";
-		}
-		return $list;
-	}
-
-}
-
-class track {
-	public $post;
-	public $name;
-	public $artists;
-	public $length;
-	public $album;
-	public $ID;
-	public $domID;
-	public $player_track;
-	
-	public function __construct($name, $ID) {
-		$this -> name = $name;
-		$this -> ID = $ID;
-		$this -> domID = "track".$name.$ID;
-		//now strip domID
-		$this->domID = str_replace(" ", '_', $this->domID);
-		$this -> post = get_post($this->ID);
-		$custom = get_post_custom($this->post->ID);
-		$terms = wp_get_post_terms($this->ID, 'music-artist', array("fields" => "all"));
-		$this->artists = $terms;
-		$this->length = $custom["video-meta-length"][0];
-		
-	}
-	public function printArtists(){
-		$str = '';
-		$count = 0;
-		foreach($this->artists as $artist){
-			if($count>0)
-				$str.=", ";
-			$str.="$artist->name";
-			$count++;
-		} 
-		return $str; 
-	}
-	/**
-	 * get jQuery to handle click and set player music
-	 */
-	public function getPlayerScript(){
-		$guid = $this->player_track->guid;
-		$artists = $this->printArtists();
-		$str = "";
-		$str.= "
-		<script>
-		\$('#$this->domID .clickable').click(function(){
-			updatePlayer('$this->name','$artists','$guid');
-		});
-		</script>
-		";
-		return $str;
-	}
+function get_category_id($cat_name){
+	$term = get_term_by('name', $cat_name, 'category');
+	return $term->term_id;
 }
 
 class CartHelper{
+	public static function getCartIcon(){
+		$count = wpsc_cart_item_count();
+		echo "
+		<div id='cart-icon-wrapper'> 
+			<div id='cart-count'>$count</div>
+			<div id='cart-icon'></div>
+		</div>
+		 ";
+	}
+	
 	public static function echoBuyNow($id){
-		?>
+		?> 
 		<div class="wpsc_buy_button_container">
            <?php if(wpsc_product_external_link($id) != '') : ?>
            <?php $action = wpsc_product_external_link( $id ); ?>
@@ -278,7 +52,7 @@ class CartHelper{
                   
          <!-- multi currency code -->
                   
-                   <p class="pricedisplay">Shipping:<span class="pp_price"><span class="pricedisplay">'.$price.'</span></span></p>
+                   <p class="pricedisplay" style="display:none;">Shipping:<span class="pp_price"><span class="pricedisplay">'.$price.'</span></span></p>
                 
                </div><!--close wpsc_product_price-->
        
@@ -307,6 +81,52 @@ class CartHelper{
 class DBHelper {
 	
 	/**
+	 * returns an array of article posts for given parameters
+	 */
+	public static function getArticles($category = "All", $artist = "All"){
+		wp_reset_query();
+		$filtered_posts = array(); //empty array to put posts once filtered
+		$cat_id = get_category_id($category);
+		$args = array('posttype' => 'post', 'category'  => $cat_id, 'numberposts'  => 2000);
+		//if category is all ignore the category parameter 
+		if($category=="All")
+			$args = array('posttype' => 'post', 'numberposts'     => 2000);
+		$posts = get_posts($args);
+		//now iterate post and compare to artist. remove if no artist taxonmy items match passed item
+		if($artist!="All")
+		{
+			foreach($posts as $post){
+				$valid_artist = false;
+				$cats = wp_get_post_terms($post->ID, 'music-artist', array("fields" => "all"));
+				foreach($cats as $cat)
+				{
+					if($cat->name == $artist)
+					$valid_artist = true;
+				}
+				//if after search post had a matching artist term then add to the filtered posts array
+				if($valid_artist==true)
+					$filtered_posts [] = $post; 
+			}
+			return $filtered_posts;
+		}
+		else 
+			return $posts;
+	}
+	
+	public static function getArticleCategories(){
+		global $post;
+		$PAGE_ID = $post -> ID;
+		$url = get_bloginfo('url')."?page_id=$PAGE_ID";
+		
+		$terms = get_terms("category","orderby=count&hide_empty=1");
+		echo "<li><a href='$url&cat=All' class='category' name='All'>All</a></li>";
+		foreach ($terms as $term) {
+			if($term->name!="Uncategorized")
+			echo "<li><a href='$url&cat=$term->name' class='category' name='$term->name'>$term->name</a></li>";
+		}
+	}
+	
+	/**
 	 * echos out a list of categories based on passed product type and taxonomy name
 	 */
 	public static function getTaxonomyList($product_type, $taxonomy_name){
@@ -314,6 +134,30 @@ class DBHelper {
 		$labels = array('All');
 		//query db
 		$args = array('post_type' => 'wpsc-product', 'numberposts' => 2000, 'wpsc_product_category' => $product_type);
+		$the_query = new WP_Query($args);
+		//iterate albums
+		while ($the_query -> have_posts()) :
+			$the_query -> the_post();
+			$categories = wp_get_post_terms($the_query->post->ID, $taxonomy_name, array("fields" => "all"));
+			// // add to labels even if NOT new
+			foreach($categories as $cat){
+				 $labels [] = $cat->name;
+			 } 
+		endwhile;
+		//clean out duplicates
+			$labels  = array_unique($labels);		
+		foreach($labels as $label){
+			echo "<li><a href='#'>$label</a></li>";
+		}
+	}
+	/**
+	 * echos out a list of categories based on passed product type and taxonomy name
+	 */
+	public static function getPostTaxonomyList($taxonomy_name){
+		//create cat array	
+		$labels = array('All');
+		//query db
+		$args = array('post_type' => 'post', 'numberposts' => 2000);
 		$the_query = new WP_Query($args);
 		//iterate albums
 		while ($the_query -> have_posts()) :

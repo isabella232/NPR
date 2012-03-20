@@ -40,8 +40,17 @@
 <![endif]-->
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
 <script>
+	/**
+	 * scripts to show ajax loading gif
+	 */
+	// $("a").click(function(e){
+		// e.preventDefault();
+		// alert("clicked");
+		// loadFromInto($(this), "#main");
+	// });
 	$(document).ready(function(){
 		$("body").append("<div id='ajaxloaderdiv'></div>");
+		
 	});
 	function showAjaxLoader(){
 		$("#ajaxloaderdiv").show();
@@ -49,10 +58,19 @@
 	function hideAjaxLoader(){
 		$("#ajaxloaderdiv").hide();
 	}
+	$("#ajaxloaderdiv").click(function(){
+		hideAjaxLoader();
+	});	
+	
+	function removeCurrentClass(){
+	var elems = new Array("#artist-tax li a","#genre-tax li a","#category-tax li a");
+	var i = 0;
+	for(i = 0 ; i < elems.length ; i ++ )
+	$(elems[i]).each(function(){
+		$(this).removeClass("current");
+	});
+	}
 </script>
-<script type="text/javascript" src="<?php bloginfo('template_directory');?>/js/jQuery.jPlayer.2.1.0/jquery.jplayer.min.js"></script>
-<link type="text/css" REL=StyleSheet href="<?php bloginfo('template_directory');?>/js/jQuery.jPlayer.2.1.0/css/styles.css"/>
-
 <?php wp_head(); ?>
 </head> 
 
@@ -69,13 +87,52 @@
 				<?php bloginfo( 'description' ); ?>
 			</span>
 		</hgroup>
-
+		<!-- nav clicks capture by script below -->
 		<nav role="navigation" class="site-navigation main-navigation">
 			<h1 class="assistive-text"><?php _e( 'Menu', '_s' ); ?></h1>
 			<div class="assistive-text skip-link"><a href="#content" title="<?php esc_attr_e( 'Skip to content', '_s' ); ?>"><?php _e( 'Skip to content', '_s' ); ?></a></div>
 
 			<?php wp_nav_menu( ); ?>
 		</nav>
+		<script>
+	/**
+	 * scripts to capture menu clicks
+	 */
+	<?php 
+	/**
+	 * GLOBAL SWITCH FOR AJAX PAGE LOADING
+	 */
+		global $ajax_is_on; 
+		$ajax_is_on = true; 
+	?>
+	/**
+	 * function for loading the href off an element into the passed target div
+	 */
+	function loadFromInto(fromElem, intoElem){
+		var from = $(fromElem); 
+		var into = $(intoElem);
+		var href = from.attr("href");
+		var title = from.text();
+	  	showAjaxLoader();
+	  	location.hash = title;
+	  	
+	  	into.load(href, null, hideAjaxLoader); 
+	}
+	
+	$(".menu-item a").click(function(event) {
+	  event.preventDefault();
+	  stripCurrentClasses();
+	  $(this).parent().addClass("current_page_item ");
+	  loadFromInto($(this),"#main");
+	});
+	
+	function stripCurrentClasses(){
+		$(".menu li").each(function(){
+			$(this).removeClass("current_page_item");
+			$(this).removeClass("current-menu-item ");
+		});
+	}
+		</script>
 	</header><!-- #masthead .site-header -->
 
 	<div id="main">

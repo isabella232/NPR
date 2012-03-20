@@ -9,6 +9,23 @@ class UI{
 			</div>
 		";
 	}
+	
+	public static function getHeaderReplacement(){
+		echo "
+		
+		";
+	}
+	
+	public static function ajaxheader(){
+		global $ajax_is_on;
+		if($ajax_is_on) 
+		get_header(); 
+	}
+	public static function ajaxfooter(){
+		global $ajax_is_on;
+		if($ajax_is_on)  
+		get_footer(); 
+	} 
 }
 
 ?>

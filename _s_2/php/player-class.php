@@ -18,8 +18,8 @@ class player {
 		echo '
 		<div id="player-wrapper">
 		<div id="jp_screen">
-				<h3 class="player_track">player_track: The Beat</h3>
-				<h3 class="artist">Artist: Jack Mahoney</h3>
+				<h3 class="player_track">Track:</h3>
+				<h3 class="artist">Artist: </h3>
 		</div>
 		<!--container for everything-->
 	<div id="jp_container_1" class="jp-video jp-video-360p">
@@ -82,42 +82,19 @@ class player {
 	?>
 	
  	<script type="text/javascript">
-	    $(document).ready(function(){
-	      $("#jquery_jplayer_1").jPlayer({
-	        ready: function () { 
-	          $(this).jPlayer("setMedia", {
-	          	mp3: '<?php echo $player_tracks[0]->guid; ?>'
-	          });
-	        },
-	        swfPath: "/js",
-	        supplied: "mp3"
-	      });
-	    });
+	    // $(document).ready(function(){
+	      // $("#jquery_jplayer_1").jPlayer({
+	        // ready: function () { 
+	          // $(this).jPlayer("setMedia", {
+	          	// mp3: '<?php echo $player_tracks[0]->guid; ?>'
+	          // });
+	        // },
+	        // swfPath: "/js",
+	        // supplied: "mp3"
+	      // });
+	    // });
 	    
-	    function updatePlayer(name, artist, guid){
-	    	var player = $("#jquery_jplayer_1");
-	    	lcdTrack = $("#jp_screen .player_track"); //the track display
-	    	lcdArtist = $("#jp_screen .artist"); //the artist display
-	    	lcdTrack.html("Track: "+name);
-	    	lcdArtist.html("Artists: "+artist);
-	    	$("#jquery_jplayer_1").jPlayer({
-	        ready: function () { 
-	          $(this).jPlayer("setMedia", { 
-	          	mp3: guid
-	          	
-	          }); 
-	          $(this).jPlayer("play", 0);
-	        },
-	        swfPath: "/js",
-	        supplied: "mp3",
 	    
-	      }); 
-	       $("#jquery_jplayer_1").jPlayer("setMedia", { 
-	          	mp3: guid
-	          	
-	          }); 
-	          $("#jquery_jplayer_1").jPlayer("play", 0);
-	    }
 	</script>
 	
 	<?php

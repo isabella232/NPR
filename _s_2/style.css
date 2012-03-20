@@ -499,7 +499,7 @@ body {
 }
 #lh_sidebar li a.current {
 	color: black;
-	background: white;
+	background: #f6f6f6 url("res/selected-item.png") repeat-y top right;
 	padding-right: 0px;
 }
 #lh_sidebar li a:hover {
@@ -805,7 +805,7 @@ a.read-more {
 	text-align: center;
 }
 #single-post {
-	margin: 10px auto;
+	margin: 10px auto 200px auto;
 	padding: 10px 20px;
 	background: transparent;
 	border: none;
@@ -816,6 +816,7 @@ a.read-more {
 	color: #222;
 	font-size: 13px;
 	padding-bottom: 100px;
+	position: relative;
 }
 #single-post h2, #single-post h1 {
 	font-size: 26px;
@@ -1163,4 +1164,72 @@ cursor: pointer;
 .track-list tr:hover{
 	background:#666;
 	cursor:pointer;
+}
+a {
+text-decoration: none;
+}
+
+#article-back-button{
+position: absolute;
+top: 34px;
+left: -90px;
+width: 80px;
+height: 20px;
+background: transparent url('res/back-arrow.png') no-repeat center center;
+color: white;
+cursor: pointer;
+text-align: center;
+padding: 5px;
+font-weight: bold;
+text-shadow: 0px 1px 0px black;
+letter-spacing: 1px;
+text-indent: 12px;
+}
+#article-back-button:hover{
+	background-image:url("res/back-arrow-hover.png");
+}
+.taxonomy-div{
+	margin-bottom:20px;
+}
+/*cart icon*/
+#cart-icon-wrapper{
+	display:inline-block;
+	position:absolute;
+	top: 17px;
+	right:30px;
+}
+#cart-icon{
+	display:inline-block;
+	float:left;
+	height:20px; 
+	width:20px;
+	background: transparent url('res/cart-icon.png') no-repeat center center;
+}
+#cart-count{
+	margin-right: 10px;
+	display:inline-block;
+	float:left;
+	height:20px;
+	width:20px;
+	background:#eee;
+	border-radius:20px;
+	color:black;
+	line-height:20px;
+	text-align:center;
+	font-size:14px;
+	font-weight:bold;
+	top:14px;
+	left:14px;
+	box-shadow: inset 0px 3px 3px rgba(0,0,0,0.4);
+	text-shadow: 0px 1px 0px white;
+}
+.wpsc_product_price {
+	display:inline-block;
+}
+.track-list .wpsc_buy_button_container{
+	display:inline-block;
+	padding:0px;
+}
+.track-list .pricedisplay{
+	padding-right:10px;
 }

@@ -3,19 +3,18 @@
  * Template name: Music Template
  */
 
-// echo "<br/><br/><br/><br/>";
+UI::ajaxheader();
 
- 
- 
-get_header(); ?>
+	
+?>
 <div id="lh_sidebar">
 	<ul>
 		<?php 
-		echo "<div id='genre-tax'>";
+		echo "<div id='genre-tax' class='taxonomy-div'>";
 		echo "<h2>Genres</h2>";
 		DBHelper::getTaxonomyList('album','music-category');
 		echo "</div>";
-		echo "<div id='artist-tax'>";
+		echo "<div id='artist-tax' class='taxonomy-div'>";
 		echo "<h2>Artists</h2>";
 		DBHelper::getTaxonomyList('album','music-artist');
 		echo "</div>"
@@ -33,8 +32,6 @@ get_header(); ?>
 	/**
 	 *  DISPLAY RESULTS OF MUSIC SEARCH
 	 */
-		
-	
 	$albums = DBHelper::getAlbums(); 
 	foreach($albums as $album){
 		$album->makeView();
@@ -78,14 +75,7 @@ $("#genre-tax li a").click(function(e){
 	ajaxLoadAlbums(value,'null');
 });
 
-function removeCurrentClass(){
-	var elems = new Array("#artist-tax li a","#genre-tax li a");
-	var i = 0;
-	for(i = 0 ; i < elems.length ; i ++ )
-	$(elems[i]).each(function(){
-		$(this).removeClass("current");
-	});
-}
+
 /**
  * make ajax call to load a series of albums
  */
@@ -119,6 +109,7 @@ function ajaxSubmit(id){
 				    $("#container").append(data);
 					setUpFullView();
 					hideAjaxLoader();
+					$("#container").scrollTop();
 				  }
 			    });				  
 				}
@@ -169,10 +160,15 @@ $(window).resize(function() {
 function arrange(){
   $('#container').masonry({
     // options
-    itemSelector : '.item-wrapper',
+    itemSelector : '.item-wrapper', 
     columnWidth : 244,
     isAnimated: true
   });
 }
+
+
+
 </script>	
-<?php get_footer(); ?>
+<?php 
+UI::ajaxfooter();
+ ?>

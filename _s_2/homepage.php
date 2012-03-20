@@ -3,7 +3,6 @@
  * Template name: Homepage Template
  */
 get_header(); ?>
-<h1 class='homepage-indent'><p>Articles</p></h1>
 <div>
 	<div id="slider-wrapper">
 		<div id="article-slider">

@@ -123,6 +123,19 @@ add_action( 'wp_enqueue_scripts', '_s_scripts' );
  * PROJECT BEGINS
  */ 
 
+//debugging functions
+function jbug($var) {
+	echo "<pre>";
+	var_dump($var);
+	echo "</pre>";
+}
+function jalert($var) {
+	echo "<script>";
+	echo" alert('";
+	echo $var;
+	echo "');";
+	echo "</script>";
+}
 add_theme_support( 'post-thumbnails' );
 add_image_size( 'homepage-thumb', 220, 180, true );
 add_image_size( 'article-thumb', 400, 180, false );
@@ -133,6 +146,8 @@ add_image_size( 'full', 700, 420, true );
 include "php/video-class.php";
 include "php/ui-class.php";
 include "php/player-class.php";
+include "php/album-class.php";
+include "php/article-class.php";
 include "php/options.php";
 include "php/dbhelper.php";
 include "php/jplayer/jplayer.php";
@@ -141,8 +156,8 @@ include "php/nprwidgets/npr_shopping_cart_widget.php";
 /**
  * add taxonomy to wpsc post type 
  */
-register_taxonomy("music-artist", "wpsc-product", array("hierarchical" => true, "label" => "Artists", "singular_label" => "Category", "rewrite" => true));   
-register_taxonomy("music-category", "wpsc-product", array("hierarchical" => true, "label" => "Music Categories", "singular_label" => "Category", "rewrite" => true));   
+register_taxonomy("music-artist", array( 'post', 'wpsc-product' ), array("hierarchical" => true, "label" => "Artists", "singular_label" => "Category", "rewrite" => true));   
+register_taxonomy("music-category", array( 'post', 'wpsc-product' ), array("hierarchical" => true, "label" => "Music Genres", "singular_label" => "Category", "rewrite" => true));   
 
 /**
  * add custom fields
@@ -340,3 +355,18 @@ die();
 }
 add_action('wp_ajax_displayAlbums', 'displayAlbums');
 add_action('wp_ajax_nopriv_displayAlbums', 'displayAlbums');
+
+function displayArticles(){
+	global $post;
+	$category = $_POST['category'];
+	$artist = $_POST['artist'];
+	$articles = DBHelper::getArticles($category, $artist);
+	foreach($articles as $post){
+		article::display();
+	}
+	echo article::getLinkScript($category,$artist);
+	
+die();
+}
+add_action('wp_ajax_ddisplayArticles', 'displayArticles');
+add_action('wp_ajax_nopriv_displayArticles', 'displayArticles');

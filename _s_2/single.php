@@ -6,10 +6,10 @@
  * @since _s 1.0
  */
 
-get_header(); ?>
+UI::ajaxheader(); ?>
 
 		<div id="primary" class="site-content">
-			<div id="content" role="main">
+			<div id="content" role="main"> 
 		
 			<?php while ( have_posts() ) : the_post(); ?>
 
@@ -40,12 +40,14 @@ get_header(); ?>
 			</div><!-- #content -->
 		</div><!-- #primary .site-content -->
 
-<?php get_footer(); ?>
+<?php UI::ajaxfooter(); ?>
  
 <?php 
+
 function displayArticle(){
 
 	echo "<div id='single-post'>
+	<div id='article-back-button'>Back</div>
 	<div class='post-wrap'>
 	<p>"; 
 
@@ -66,11 +68,28 @@ function displayArticle(){
 		echo "<h3 class='date'>";the_date();echo"</h3><br/>";
 	the_content();
 	echo "</p></div>";
-	comments_template();
-	getCommentsJquery();
-	getRelatedPostsBar();
+	getBackButtonScript();
+	//comments_template();
+	//getCommentsJquery();
+	//getRelatedPostsBar();
 	echo "	</div>";
 	
+}
+
+function getBackButtonScript(){
+	$selected_artist = $_GET['artist'];
+$selected_category = $_GET['category'];
+	?>
+	<script>
+	var category = "<?php echo $selected_category; ?>";
+	var artist = "<?php echo $selected_artist; ?>";
+		$("#article-back-button").click(function(e){
+			e.preventDefault();
+			ajaxLoadArticles(category,artist);
+			
+		});
+	</script>
+	<?php
 }
 
 function getPostTags(){
@@ -91,7 +110,7 @@ function getPostTags(){
 
 function getCommentsJquery(){
 ?>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+<!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>--> 
 <script>
 	$(document).ready(function(){
 		$(".comments-title").append(" - <a href='#' id='see-discussion'>See the discussion</a>");
@@ -145,7 +164,7 @@ function getRelatedPostsBar(){
 	</div>
 	";
 		?>
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+<!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>-->
 <script src="http://bxslider.com/sites/default/files/jquery.bxSlider.min.js" type="text/javascript"></script>
 <script type="text/javascript">
   $(document).ready(function(){
