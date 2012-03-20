@@ -43,9 +43,9 @@ UI::ajaxheader(); ?>
 <?php UI::ajaxfooter(); ?>
  
 <?php 
-
+$article;
 function displayArticle(){
-
+	$article = new article($post); 
 	echo "<div id='single-post'>
 	<div id='article-back-button'>Back</div>
 	<div class='post-wrap'>
@@ -55,6 +55,7 @@ function displayArticle(){
 				<div>";
 			echo "<div id='feature-images-inner'>";
 			echo	the_post_thumbnail('full'); 
+			//$article->getCaption();
 			getShareButtons();
 			echo "</div>";
 				echo "<div id='tags'>";	

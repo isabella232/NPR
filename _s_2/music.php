@@ -32,15 +32,19 @@ UI::ajaxheader();
 	/**
 	 *  DISPLAY RESULTS OF MUSIC SEARCH
 	 */
-	$albums = DBHelper::getAlbums(); 
-	foreach($albums as $album){
-		$album->makeView();
-	}
+	// $albums = DBHelper::getAlbums(); 
+	// foreach($albums as $album){
+		// $album->makeView();
+	// }
 	
 	
 ?>
-<script>  
-
+<script> 
+	$(document).ready(function(){
+		ajaxLoadAlbums("All",'null');
+	});
+ 
+var max_container_height;
 /**
  * reposition fullview on resize
  */
@@ -87,14 +91,16 @@ function ajaxLoadAlbums(genre,artist){
 			        type:       'post',
 			        data:       { "action":"displayAlbums", "artist":artist , "genre":genre},
 			        success: function(data) {
-			        $("#container").html("");
-				    $("#container").append(data);
-					hideAjaxLoader();
-				  }
+			        $("#container").empty();
+			        hideAjaxLoader();
+				    reloadMasonry(data);
+				  } 
 			    });				  
 				}
 				return false;
 } 
+
+
 /**
  * make ajax call to load full view for album
  */
@@ -144,8 +150,10 @@ function restoreAlbums(){
 	);
 }			
 
-
 $(document).ready(function(){
+	
+	max_container_height = $("#container").height();
+	
 	var w = $(window).width() - 240;
   $('#container').width(w);
 	arrange();
@@ -158,12 +166,15 @@ $(window).resize(function() {
 });	
 
 function arrange(){
+
+	
   $('#container').masonry({
     // options
     itemSelector : '.item-wrapper', 
     columnWidth : 244,
     isAnimated: true
   });
+
 }
 
 

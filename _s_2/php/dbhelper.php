@@ -11,7 +11,11 @@ class CartHelper{
 		$count = wpsc_cart_item_count();
 		echo "
 		<div id='cart-icon-wrapper'> 
-			<div id='cart-count'>$count</div>
+			<div id='cart-count'>
+				<div class='text'>
+				$count
+				</div>
+			</div>
 			<div id='cart-icon'></div>
 		</div>
 		 ";

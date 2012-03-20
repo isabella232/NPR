@@ -48,17 +48,35 @@
 		// alert("clicked");
 		// loadFromInto($(this), "#main");
 	// });
-	$(document).ready(function(){
-		$("body").append("<div id='ajaxloaderdiv'></div>");
+
+		/**
+	 * called by pages using masonry to reload ajax appended divs
+	 */
+	function reloadMasonry(data){
+
+		$('#container').masonry({
+		    // options 
+		    itemSelector : '.item-wrapper', 
+		    singleMode: true,
+		    isAnimated: true
+		  });
+		$("#container").append(data);//.masonry( 'appended', data , true);
+		
+		$.when($("#container").masonry('reload')).then($(".item-wrapper").animate( {opacity:1}, 500 ));
+	}	 	 
+	
+	
+	jQuery(document).ready(function(){
+		jQuery("body").append("<div id='ajaxloaderdiv'></div>");
 		
 	});
 	function showAjaxLoader(){
-		$("#ajaxloaderdiv").show();
+		jQuery("#ajaxloaderdiv").show();
 	}
 	function hideAjaxLoader(){
-		$("#ajaxloaderdiv").hide();
+		jQuery("#ajaxloaderdiv").hide();
 	}
-	$("#ajaxloaderdiv").click(function(){
+	jQuery("#ajaxloaderdiv").click(function(){
 		hideAjaxLoader();
 	});	
 	
@@ -66,8 +84,8 @@
 	var elems = new Array("#artist-tax li a","#genre-tax li a","#category-tax li a");
 	var i = 0;
 	for(i = 0 ; i < elems.length ; i ++ )
-	$(elems[i]).each(function(){
-		$(this).removeClass("current");
+	jQuery(elems[i]).each(function(){
+		jQuery(this).removeClass("current");
 	});
 	}
 </script>
@@ -109,8 +127,8 @@
 	 * function for loading the href off an element into the passed target div
 	 */
 	function loadFromInto(fromElem, intoElem){
-		var from = $(fromElem); 
-		var into = $(intoElem);
+		var from = jQuery(fromElem); 
+		var into = jQuery(intoElem);
 		var href = from.attr("href");
 		var title = from.text();
 	  	showAjaxLoader();
@@ -119,17 +137,17 @@
 	  	into.load(href, null, hideAjaxLoader); 
 	}
 	
-	$(".menu-item a").click(function(event) {
+	jQuery(".menu-item a").click(function(event) {
 	  event.preventDefault();
 	  stripCurrentClasses();
-	  $(this).parent().addClass("current_page_item ");
-	  loadFromInto($(this),"#main");
+	  jQuery(this).parent().addClass("current_page_item ");
+	  loadFromInto(jQuery(this),"#main");
 	});
 	
 	function stripCurrentClasses(){
-		$(".menu li").each(function(){
-			$(this).removeClass("current_page_item");
-			$(this).removeClass("current-menu-item ");
+		jQuery(".menu li").each(function(){
+			jQuery(this).removeClass("current_page_item");
+			jQuery(this).removeClass("current-menu-item ");
 		});
 	}
 		</script>

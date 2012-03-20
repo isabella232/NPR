@@ -181,6 +181,9 @@ class album {
 			}
 		
 		$list.= "</table>";
+		$list.="
+		
+		";
 		}
 		return $list;
 	}

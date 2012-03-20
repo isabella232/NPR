@@ -10,7 +10,6 @@
 ?>
 
 	</div><!-- #main -->
-
 	<footer id="colophon" class="site-footer" role="contentinfo">
 		
 		<div class="site-info">
@@ -28,11 +27,29 @@
 <link type="text/css" REL=StyleSheet href="<?php bloginfo('template_directory');?>/js/jQuery.jPlayer.2.1.0/css/styles.css"/>
 
 <script>
+/**
+ * listen for product form submissions
+ */
+$("form.product_form").live("submit", function(){
+$.ajax({
+		        url:        '<?php echo get_bloginfo('url')?>/wp-admin/admin-ajax.php',
+		        type:       'post',
+		        data:       { "action":"fetchCartCount"},
+		        success: function(data) {
+		        		$("#cart-count .text").slideUp('slow', function(){
+		        			$("#cart-count .text").remove();
+		        			$("#cart-count").append("<div class='text'></div>");
+		        			$("#cart-count .text").text(data);
+		        		});
+		        		
+			    		
+				    }
+				 });
+});	
 
-	/**
-	 * player scripts
-	 */
-
+/**
+ * player scripts
+ */
 function updatePlayer(name, artist, guid){
 	    	var player = $("#jquery_jplayer_1");
 	    	lcdTrack = $("#jp_screen .player_track"); //the track display

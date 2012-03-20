@@ -195,6 +195,17 @@ function npr_save_album_meta(){
         update_post_meta($post->ID, "album-meta-name", $_POST["album-meta-name"]);  
     }  
 }
+add_action('save_post', 'npr_save_post_meta');   
+
+function npr_save_post_meta(){  
+    global $post;    
+  		
+    if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ){  
+        return $post_id;  
+    }else{  
+        update_post_meta($post->ID, "post-meta-picturecaption", $_POST["post-meta-picturecaption"]);  
+    }  
+}
 
 /** 
  * Add metaboxes
@@ -216,7 +227,27 @@ function npr_meta_box(){
 	//get the category
 	$terms = get_terms("wpsc_product_category");
     add_meta_box("video-meta", "Track Information", "npr_video_meta_options", "wpsc-product", "side", "high");  
-}    
+}  
+  
+add_action("admin_init", "npr_post_meta_box");     
+  
+function npr_post_meta_box(){
+    add_meta_box("featuredimage-meta", "Featured Image Settings", "npr_post_meta_options", "post", "side", "high");  
+} 
+
+function npr_post_meta_options(){  
+        global $post;  
+        if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ) return $post_id;  
+        $custom = get_post_custom($post->ID);  
+       
+?> 
+<table> 
+	<tr>
+    	<td><label>Picture Caption:</label></td><td><input name="post-meta-picturecaption" value="<?php echo ($custom["post-meta-picturecaption"][0]); ?>" /></td>
+    </tr>
+</table>
+<?php   
+    }    
   
 function npr_album_meta_options(){  
         global $post;  
@@ -350,7 +381,6 @@ function displayAlbums(){
 	foreach($albums as $album){
 		$album->makeView();
 	}
-	
 die();
 }
 add_action('wp_ajax_displayAlbums', 'displayAlbums');
@@ -368,5 +398,14 @@ function displayArticles(){
 	
 die();
 }
-add_action('wp_ajax_ddisplayArticles', 'displayArticles');
+add_action('wp_ajax_displayArticles', 'displayArticles');
 add_action('wp_ajax_nopriv_displayArticles', 'displayArticles');
+
+function fetchCartCount(){
+	
+	echo wpsc_cart_item_count();
+	
+die();
+}
+add_action('wp_ajax_fetchCartCount', 'fetchCartCount');
+add_action('wp_ajax_nopriv_fetchCartCount', 'fetchCartCount');

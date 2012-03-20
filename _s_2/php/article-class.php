@@ -1,5 +1,19 @@
 <?php
 class article{
+	public $post;
+	public $ID;
+	public $custom;
+	public $caption;
+	public function __construct($post){
+		$this->post = $post;
+		$this->custom = get_post_custom($this->post->ID);
+		$this->caption = $this->custom["post-meta-picturecaption"][0]; 
+	}
+	
+	public function getCaption(){
+		echo "<p class='single-caption'>$this->caption<p>";
+	}
+	
 	public static function display(){
 		?>
 		

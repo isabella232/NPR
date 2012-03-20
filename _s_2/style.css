@@ -1027,6 +1027,7 @@ h1.homepage-indent {
 	zoom: 1;
 	height: auto;
 	display: block;
+	max-width: 500px;
 }
 .admin-bar #masthead {
 	top: 28px;
@@ -1206,22 +1207,28 @@ text-indent: 12px;
 	background: transparent url('res/cart-icon.png') no-repeat center center;
 }
 #cart-count{
+	
 	margin-right: 10px;
 	display:inline-block;
 	float:left;
-	height:20px;
-	width:20px;
+	height: 28px;
+	width: 28px;
 	background:#eee;
 	border-radius:20px;
 	color:black;
-	line-height:20px;
-	text-align:center;
-	font-size:14px;
-	font-weight:bold;
+
 	top:14px;
 	left:14px;
 	box-shadow: inset 0px 3px 3px rgba(0,0,0,0.4);
 	text-shadow: 0px 1px 0px white;
+}
+#cart-count .text{
+	height: 28px;
+	width: 28px;
+	line-height: 28px;
+	text-align:center;
+	font-size:14px;
+	font-weight:bold;
 }
 .wpsc_product_price {
 	display:inline-block;
@@ -1232,4 +1239,13 @@ text-indent: 12px;
 }
 .track-list .pricedisplay{
 	padding-right:10px;
+}
+/*item wrapper*/
+.item-wrapper {
+    opacity: 0;
+}
+.single-caption {
+color: white;
+padding: 0px 10px;
+font-size: 12px;
 }
