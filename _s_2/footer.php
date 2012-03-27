@@ -16,7 +16,8 @@
 			<?php player::getPlayer(); ?>
 		</div><!-- .site-info -->
 		<?php
-		CartHelper::getCartIcon(); 
+		CartHelper::getCartIcon();
+		//the_widget('WP_Widget_Shopping_Cart'); 
 		?>
 	</footer><!-- .site-footer .site-footer -->
 </div><!-- #page .hfeed .site -->
@@ -27,6 +28,10 @@
 <link type="text/css" REL=StyleSheet href="<?php bloginfo('template_directory');?>/js/jQuery.jPlayer.2.1.0/css/styles.css"/>
 
 <script>
+	
+	
+
+
 /**
  * listen for product form submissions
  */

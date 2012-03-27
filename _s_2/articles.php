@@ -2,25 +2,13 @@
 /**
  * Template name: Articles Template
  */
-	// $CAT = 'All';
-// if (isset($_GET['cat']))
-	// $CAT = $_GET['cat'];
-// global $post;
-// $PAGE_ID = $post -> ID;
-// $url = get_bloginfo('url')."?page_id=$PAGE_ID";
+
 
 UI::ajaxheader();
 ?>
 <div id="lh_sidebar">
 
-		<!-- <li class='sidebar-title'>Categories</li>
-		<?php $terms = get_terms("category","orderby=count&hide_empty=1");
-		$count = count($terms);
-		echo "<li><a href='$url&cat=All' class='category' name='All'>All</a></li>";
-		foreach ($terms as $term) {
-			echo "<li><a href='$url&cat=$term->name' class='category' name='$term->name'>$term->name</a></li>";
-		}
-		?> -->
+
 		<ul>
 		<?php 
 		echo "<div id='category-tax' class='taxonomy-div'>"; 
@@ -37,18 +25,17 @@ UI::ajaxheader();
 
 </div>
 <div id="container" class="articles">
-	<?php
-		$articles = DBHelper::getArticles("All","All");
-		foreach($articles as $post){
-			article::display();
-		}
-		article::getLinkScript();
-	?>
-</div>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
-<script src="/npr/wp-content/themes/_s_2/js/masonry.js"></script>
-<script>  
 
+</div>
+
+<script>
+/**
+ * load in all articles when page first loads
+ */  
+$(document).ready(function(){
+		ajaxLoadArticles("All",'All');
+	});
+	var max_container_height;
 /**
  * ajax handle inner links
  */
@@ -71,24 +58,31 @@ $("#artist-tax li a").click(function(e){
  * make ajax call to load a series of albums
  */
 function ajaxLoadArticles(category,artist){
-				if(category!=""){
-					showAjaxLoader();
-					$.ajax({
-			        url:        '<?php echo get_bloginfo('url')?>/wp-admin/admin-ajax.php',
-			        type:       'post',
-			        data:       { "action":"displayArticles", "category":category, "artist":artist},
-			        success: function(data) {
-			        $("#container").html("");
-				    $("#container").append(data);
-					hideAjaxLoader();
-				  }
-			    });				  
-				}
-				return false;
+	if(category!=""){
+		showAjaxLoader();
+		
+		$.ajax({
+        url:        '<?php echo get_bloginfo('url')?>/wp-admin/admin-ajax.php',
+        type:       'post',
+        data:       { "action":"displayArticles", "category":category, "artist":artist},
+        success: function(data) {
+        			
+	   				$("#container").empty();
+			        hideAjaxLoader();
+			        reloadMasonry(data);
+				    hideAjaxLoader();
+				  
+	  }
+    });				  
+	}
+	return false;
 } 
 
-
+var max_container_height;
 $(document).ready(function(){
+	
+	max_container_height = $("#container").height();
+	
 	var w = $(window).width() - 240;
   $('#container').width(w);
 	arrange();
@@ -101,12 +95,15 @@ $(window).resize(function() {
 });	
 
 function arrange(){
+
+	
   $('#container').masonry({
     // options
-    itemSelector : '.item',
-    columnWidth : 244,
+    itemSelector : '.item-wrapper', 
+    singleMode : true,
     isAnimated: true
   });
+
 }
 </script>
 <?php UI::ajaxfooter(); ?>

@@ -8,17 +8,33 @@ function get_category_id($cat_name){
 
 class CartHelper{
 	public static function getCartIcon(){
+		$checkout = self::getCheckoutURL();
 		$count = wpsc_cart_item_count();
 		echo "
 		<div id='cart-icon-wrapper'> 
 			<div id='cart-count'>
-				<div class='text'>
+				<div id='cart-count-text' class='text'>
 				$count
 				</div>
 			</div>
+			<a id='cart-icon-button-link' href='$checkout' target='blank'>
 			<div id='cart-icon'></div>
+			</a>
 		</div>
-		 ";
+		 ";?>
+		 <script>
+		 var button = $("#cart-icon-button-link");
+		 var display = $("#cart-count-text");
+		 var count = display.text();
+		 button.click(function(e){
+		 	e.preventDefault();
+			if(count>0)
+				window.location.href = button.attr('href');
+			else
+				alert("Sorry your cart is empty");		 	
+		 });
+		 </script>
+		 <?php
 	}
 	
 	public static function echoBuyNow($id){
@@ -44,7 +60,7 @@ class CartHelper{
 		// $buynow = ob_get_contents();
 		// ob_end_clean();
 		$price = get_post_meta( $id, '_wpsc_price', true );
-		
+	
 		 $action =  wpsc_product_external_link(wpsc_the_product_id());
          $action = htmlentities(wpsc_this_page_url(), ENT_QUOTES, 'UTF-8' );
 		$buynow = '<form class="product_form" enctype="multipart/form-data" action="'.$action.'" method="post" name="product_'.$id.'" id="product_'.$id.'">
@@ -77,12 +93,28 @@ class CartHelper{
 		return $buynow;
 	}
 	
-	public static function getCart(){
-			the_widget('NPR_WP_Widget_Shopping_Cart');
+	public static function getCheckoutURL(){
+		return get_option('shopping_cart_url');
 	}
 }
 
 class DBHelper {
+	/**
+	 * getLatest for passed post type and return given number
+	 */
+	public static function getLatest($category, $number){
+
+	$args = array(
+    'numberposts' => $number,
+    'post_type' => 'wpsc-product',
+    'orderby' => 'post_date',
+    'order' => 'DESC',
+    'category' => $category); 
+    $recent_posts = wp_get_recent_posts( $args );
+	
+    return $recent_posts;
+	
+	}
 	
 	/**
 	 * returns an array of article posts for given parameters
@@ -102,6 +134,7 @@ class DBHelper {
 			foreach($posts as $post){
 				$valid_artist = false;
 				$cats = wp_get_post_terms($post->ID, 'music-artist', array("fields" => "all"));
+				$current = new article($post);
 				foreach($cats as $cat)
 				{
 					if($cat->name == $artist)
@@ -109,12 +142,19 @@ class DBHelper {
 				}
 				//if after search post had a matching artist term then add to the filtered posts array
 				if($valid_artist==true)
-					$filtered_posts [] = $post; 
+					$filtered_posts [] = $current; 
 			}
 			return $filtered_posts;
 		}
-		else 
-			return $posts;
+		else{
+			$article_posts = array();
+			foreach($posts as $post){
+				$current = new article($post);
+				$article_posts [] = $current;
+			}
+			return $article_posts;
+		}
+			
 	}
 	
 	public static function getArticleCategories(){
@@ -177,6 +217,50 @@ class DBHelper {
 		foreach($labels as $label){
 			echo "<li><a href='#'>$label</a></li>";
 		}
+	}
+	/**
+ 	* query albums and match on genre and artist and return album array 
+ 	*/
+	public static function getVideos($genre = 'All', $artist = 'All') {
+		$videos = array();
+		//query videos
+		$args = array('post_type' => 'wpsc-product', 'numberposts' => 2000, 'wpsc_product_category' => 'video');
+		$the_query = new WP_Query($args);
+		//iterate videos
+		while ($the_query -> have_posts()) :
+			$the_query -> the_post();
+			// create video with that name
+			$current = new video(get_the_title(), get_the_ID());
+			
+			//now see if video matchs taxonomy arguments
+			$valid_genre = true;
+			$valid_artist = true;
+			if($genre!='All'){
+				$valid_genre = false;
+				$cats = wp_get_post_terms($the_query->post->ID, 'music-category', array("fields" => "all"));
+				foreach($cats as $cat)
+				{
+					if($cat->name == $genre)
+					$valid_genre = true;
+				}
+			}
+			if($artist!='All'){
+				$valid_artist = false;
+				$cats = wp_get_post_terms($the_query->post->ID, 'music-artist', array("fields" => "all"));
+				foreach($cats as $cat)
+				{
+					if($cat->name == $artist)
+					$valid_artist = true;
+				}
+			}
+			if($valid_genre OR $valid_artist)
+				$videos[] = $current;
+			// add to videos
+		endwhile;
+
+
+		return $videos;
+		
 	}
 	/**
  	* query albums and match on genre and artist and return album array 
@@ -269,6 +353,13 @@ class DBHelper {
 
 		return $albums;
 		
+	}
+	/**
+	 * get a single video by ID
+	 */
+	public static function getVideo($id) {
+		$video = new video(get_the_title($id),$id);
+		return $video;
 	}
 	/**
 	 * get a single album and its tracks by ID

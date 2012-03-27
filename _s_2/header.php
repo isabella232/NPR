@@ -53,20 +53,23 @@
 	 * called by pages using masonry to reload ajax appended divs
 	 */
 	function reloadMasonry(data){
-
 		$('#container').masonry({
-		    // options 
-		    itemSelector : '.item-wrapper', 
+		    // options  
+		    itemSelector : ".item-wrapper" , 
 		    singleMode: true,
 		    isAnimated: true
 		  });
 		$("#container").append(data);//.masonry( 'appended', data , true);
 		
 		$.when($("#container").masonry('reload')).then($(".item-wrapper").animate( {opacity:1}, 500 ));
+		addToBodyClass("black"); 
 	}	 	 
-	
-	
-	jQuery(document).ready(function(){
+	 
+	function addToBodyClass(theClass){
+		$("body").removeClass(); //remove all
+		$("body").addClass(theClass);
+	}
+	jQuery(document).ready(function(){ 
 		jQuery("body").append("<div id='ajaxloaderdiv'></div>");
 		
 	});
@@ -112,7 +115,7 @@
 
 			<?php wp_nav_menu( ); ?>
 		</nav>
-		<script>
+<script>
 	/**
 	 * scripts to capture menu clicks
 	 */
@@ -150,7 +153,8 @@
 			jQuery(this).removeClass("current-menu-item ");
 		});
 	}
-		</script>
+
+</script>
 	</header><!-- #masthead .site-header -->
 
 	<div id="main">

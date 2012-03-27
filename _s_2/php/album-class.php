@@ -56,7 +56,10 @@ class album {
 		} 
 		return $str;
 	}
-
+	public function display(){
+		$this->makeView();
+	}
+	
 	public function makeView() {
 		echo "
 			<div class='item-wrapper' id='$this->domID'>
@@ -153,10 +156,12 @@ class album {
 	}
 
 	public function getTrackList() {
+		$imagedir = get_bloginfo("template_directory")."/res";
 		$list = "";
 		if ($this -> tracks != NULL)
 		{
 		$list.= "<table class='track-list'>";
+		$list.= "<th></th>"; 
 		$list.= "<th>Track</th>"; 
 		$list.= "<th>Length</th>";
 		$list.= "<th>Artists</th>";
@@ -171,10 +176,11 @@ class album {
 				if($count%2==0)
 					$class = "even";
 				$list.= "<tr class='$class' id='$track->domID'>";
-				$list.= "<td class='clickable'>$track->name</td>";
-				$list.= "<td class='clickable'>$track->length</td>";
-				$list.= "<td class='clickable'>$artists</td>";
-				$list.= "<td class='productcol'>$buynow</td>";
+					$list.= "<td class='clickable'><img class='grey-play-button' src='$imagedir/button_grey_play.png'></td>";
+					$list.= "<td class='clickable'>$track->name</td>";
+					$list.= "<td class='clickable'>$track->length</td>";
+					$list.= "<td class='clickable'>$artists</td>";
+					$list.= "<td class='productcol'>$buynow</td>";
 				$list.= "</tr>";
 				$list.= $track->getPlayerScript();
 				$count++;

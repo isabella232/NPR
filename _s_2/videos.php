@@ -1,123 +1,229 @@
 <?php 
-	$CAT = 'All';
-if (isset($_GET['cat']))
-	$CAT = $_GET['cat'];
-global $post;
-$PAGE_ID = $post -> ID;
-$url = get_bloginfo('url')."?page_id=$PAGE_ID";
-$loader = get_bloginfo('template_directory')."/loader_video.php";
 /**
  * Template name: Video Template
  */
+
 UI::ajaxheader();
+
+	
 ?>
-<!-- before sidebar -->
 <div id="lh_sidebar">
-	<!-- ajax -->
-	<input type="hidden" name="GreetingAll" id="GreetingAll" value="Hello Everyone!" />  
-  <input type="submit" id="PleasePushMe" />  
-  <div id="test-div1">  
-  </div>
-  <!-- ajax -->
 	<ul>
-		<?php $terms = get_terms("music-category","orderby=count&hide_empty=0");
-		$count = count($terms);
-		echo "<li><a href='$url&cat=All' class='category' name='All'>All</a></li>";
-		foreach ($terms as $term) {
-			echo "<li><a href='$url&cat=$term->name' class='category' name='$term->name'>$term->name</a></li>";
-		}
+		<?php 
+		echo "<div id='genre-tax' class='taxonomy-div'>";
+		echo "<h2>Genres</h2>";
+		DBHelper::getTaxonomyList('video','music-category');
+		echo "</div>";
+		echo "<div id='artist-tax' class='taxonomy-div'>";
+		echo "<h2>Artists</h2>";
+		DBHelper::getTaxonomyList('video','music-artist');
+		echo "</div>"
+	
 		?>
 	</ul>
 </div>
-<!-- script starts -->
-<script type="text/javascript">
-// AJAX script 
+<div id="container">
+	 
+		<div class="product_grid_display group">
+		
+		</div>
+	 
+	<?php
+	/**
+	 *  DISPLAY RESULTS OF MUSIC SEARCH
+	 */
+	// $albums = DBHelper::getAlbums(); 
+	// foreach($albums as $album){
+		// $album->makeView();
+	// }
+	
+	
+?> 
+<script> 
+	$(document).ready(function(){
+		ajaxLoadVideos("All",'null');
+	});
+ 
+var max_container_height;
+/**
+ * reposition fullview on resize
+ */
+$(window).resize(function(){
+		setUpFullView();
+	});
+			
+var fullOpen = false;
+/**
+ * show a full view
+ */		
+function showThis(id){
+
+	if(fullOpen == false){
+		enlargen(id);
+		fullOpen = true;
+	}
+	
+	
+}
+
+
+var oldSmH;
+var oldSmW;
+var currentLarge;
+function enlargen(ID){
+	currentLarge = ID; 
+	oldSmW = $(ID).width();
+	oldSmH = $(ID).height();
+	$(ID).animate({height:315,width:560}, 200,function(){
+			$(ID +" .sm-item").hide();
+			$(ID).append("<div id='big-video-container' style='width:100%;height:100%;'></div>")
+			$("#container").masonry('reload');
+			loadVideo(ID);
+		});
+}
+
+function restoreCurrentOpen(){
+		ID = currentLarge;
+		$(ID+" #big-video-container").remove();
+		$(ID).animate({height:oldSmH,width:oldSmW}, 200,function(){
+			$(ID +" .sm-item").show();
+			$("#container").masonry('reload');
+		});
+		fullOpen = false;
+}
+
+function loadVideo(ID){
+	showAjaxLoader();
+		$.ajax({
+		url:        '<?php echo get_bloginfo('url')?>/wp-admin/admin-ajax.php',
+		type:       'post',
+		data:       { "action":"loadVideo", "id":ID},
+		success: function(data) {
+		$("#big-video-container").empty();
+		$("#big-video-container").append(data);
+		}
+	});
+	hideAjaxLoader(); 
+}
+$("#artist-tax li a").click(function(e){
+	e.preventDefault();
+	var value = $(this).text();
+	removeCurrentClass();
+	$(this).addClass("current");
+	ajaxLoadVideos('null',value);
+});
+$("#genre-tax li a").click(function(e){
+	e.preventDefault();
+	var value = $(this).text();
+	removeCurrentClass();
+	$(this).addClass("current");
+	ajaxLoadVideos(value,'null');
+});
+
+
+/**
+ * make ajax call to load a series of albums
+ */
+function ajaxLoadVideos(genre,artist){
+				if(genre!=""){
+					showAjaxLoader();
+					$.ajax({
+			        url:        '<?php echo get_bloginfo('url')?>/wp-admin/admin-ajax.php',
+			        type:       'post',
+			        data:       { "action":"displayVideos", "artist":artist , "genre":genre},
+			        success: function(data) {
+			        $("#container").empty();
+			        hideAjaxLoader();
+			        //$("#container").append(data);
+				    reloadMasonry(data);
+				    hideAjaxLoader();
+				  } 
+			    });				  
+				}
+				return false;
+} 
+
+
+/**
+ * make ajax call to load full view for album
+ */
+function ajaxSubmit(id){
+				if(id!=""){
+					showAjaxLoader();
+					$.ajax({
+			        url:        '<?php echo get_bloginfo('url')?>/wp-admin/admin-ajax.php',
+			        type:       'post',
+			        data:       { "action":"fetchVideo", "id":id},
+			        success: function(data) {
+				    $("#container").append(data);
+					setUpFullView();
+					hideAjaxLoader();
+					$("#container").scrollTop();
+				  }
+			    });				  
+				}
+				return false;
+} 
+/**
+ * position the full view and make div heights match
+ */
+function setUpFullView(){
+	
+	var position = ( $("#container").width() )/ 2;
+	
+	position = position - ( ($(".large-item").width() )/2 );
+	$(".large-item").css("margin-left",position+"px");
+	var rightH = $(".right-bar").height();
+	var leftH = $(".left-bar").height();
+	var H = Math.max(rightH,leftH);
+	$(".right-bar").height(H);
+	$(".left-bar").height(H);
+	$(".large-item .close").click(restoreAlbums);
+} 
+/**
+ * remove full view and restore albums
+ */
+function restoreAlbums(){
+	fullOpen = false;
+	$(".large-item").remove();
+	$("#container div").each(
+		function(){
+			$(this).fadeIn('200');
+		}
+	);
+}			
+
 $(document).ready(function(){
 	
+	max_container_height = $("#container").height();
 	
- $("#lh_sidebar li a").each(
- 	function(){
- 		var loader = '';
- 		var name = $(this).attr("name");  
- 		$(this).click(function(e){
- 			e.preventDefault();
- 			removeOtherClasses();
- 			$(this).addClass("current");
- 			window.location=$(this).attr("href");
- 		});
- 	});
+	var w = $(window).width() - 240;
+  $('#container').width(w);
+	arrange();
 });
-function removeOtherClasses(){
-	$("#lh_sidebar li a").each(
- 	function(){
- 		$(this).removeClass("current");
- 	});
-}
-</script>
-<div id="container">
-	<?php $videos = array();
-	/** query products with category video */
-	$args = array('post_type' => 'wpsc-product' , 
-					'numberposts' => 2000, 
-					'wpsc_product_category'  => 'video');
-	$the_query = new WP_Query( $args );
-	while ( $the_query->have_posts() ) : $the_query->the_post();
-		
-		$current = new Video($post);
-		$videos[] = $current;
-		$post_cat_array = wp_get_post_terms($post->ID, 'music-category');
-		$display_it = false; 
-		foreach($post_cat_array as $cat)
-		{
-			if($cat->name == $CAT)  
-			{
-				$display_it = true;
-			}
-		}
-		if($display_it OR $CAT == "All")
-			$current->makeVideoBox();
-	endwhile;
-	
-	
-	?>
-
-</div>
-<script src="/npr/wp-content/themes/_s_2/js/masonry.js"></script>
-<script>
-var columnwidth = 242;
-var marginsize = 230;
-	$(document).ready(function(){
-$('.sm-video').animate({
-opacity: 1 
-}, 500, function() {
-
-});
-
-var w = $(window).width() - marginsize;
-$('#container').width(w);
-arrange();
-}); 
 
 $(window).resize(function() {
-var w = $(window).width() - marginsize;
-$('#container').width(w);
-arrange();
-});
+	var w = $(window).width() - 240;
+  $('#container').width(w);
+	arrange();
+});	
 
 function arrange(){
-$('#container').masonry({
-// options
-itemSelector : '.item-wrapper',
-columnWidth : columnwidth,
-isAnimated: true
-});
 
-$('.category').click(function(){
-var category = $(this).attr('name');
-window.location.href="<?php echo bloginfo('url') . "?page_id=" . $PAGE_ID;?>
-	&cat="+category;
-	});
+if(fullOpen==false)
+  $('#container').masonry({
+    // options
+    itemSelector : '.item-wrapper', 
+    singleMode : true,
+    isAnimated: true
+  });
 
-	}
-</script>
-<?php UI::ajaxfooter();?>
+}
+
+
+
+
+</script>	
+<?php 
+UI::ajaxfooter();
+ ?>

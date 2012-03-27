@@ -1,165 +1,159 @@
 <?php
-
-class Video{
+class video {
+	public $tracks;
+	public $name;
+	public $ID;
+	public $domID;
+	public $fulldomID;
+	public $permalink;
+	public $thumbnail;
+	public $categories;
+	public $artists;
+	public $released; 
+	public $embedUrl;
+	public function __construct($name, $ID) {
+		$this -> name = $name;
+		$this -> ID = $ID;
+		$this -> domID = str_replace(" ", '', ($this -> name ."_". $this -> ID));
+		$this -> domID = str_replace(":", '', $this -> domID );
+		
+		  
+		$this -> fulldomID = $this -> domID . "full";
+		$this -> permalink = get_permalink($this->ID);
+		$this->thumbnail = get_the_post_thumbnail($this -> ID, "video-thumb");
+		$this->categories = wp_get_post_terms($this->ID, 'music-category', array("fields" => "all"));
+		$terms = wp_get_post_terms($this->ID, 'music-artist', array("fields" => "all"));
+		$this->artists = $terms;
+		
+		$custom = get_post_custom($this->ID);
+		$this->embedUrl = $custom["video-meta-embed"][0];
+		$this->released = $custom["video-meta-release"][0]; 
+	}
 	
-	private $post;
-	private $embed;
-	private $track;
-	private $artists;
-	private $album;
-	private $release;
-	private $categories;
-	private $category;
-	private $identity;
-	 
-	public function __construct($post){
-		$this->post = $post;
-		$this->identity = "video-".$post->ID;
-			$custom = get_post_custom($post->ID);
-			$this->categories = get_terms("wpsc-product-category");
-			$this->category = $this->categories->name;
-			$this->embed = $custom["video-meta-embed"][0];
-			$this->artists = $custom["video-meta-artists"][0];
-			$this->track = $custom["video-meta-track"][0];
-			$this->album = $custom["video-meta-album"][0];
-			$this->release = $custom["video-meta-release"][0];
-	}	
+	public function getVideo(){
+		echo "<div class='close' onclick='restoreCurrentOpen();'></div><iframe width='560' height='315' src='http://www.youtube.com/embed/$this->embedUrl?wmode=opaque' frameborder='0' allowfullscreen></iframe>";
+
+	}
 	
 	public function getCategories(){
-		$terms = get_terms("wpsc-product-category");
-		 $count = count($terms);
-		 if ( $count > 0 ){
-		     echo "<ul>";
-		     foreach ( $terms as $term ) {
-		       echo "<li>" . $term->name . "</li>";
-		        
-		     }
-		     echo "</ul>";
-		 }
+		$str = "";
+		$count =0;
+		foreach($this->categories as $category){
+			if($count>0)
+			$str.= ", ";
+			$str.= "<a href='#'>".$category->name."</a>";
+			$count++;			
+		}
+		return $str;
 	}
-	public function getCategory(){
-		return $this->categories[0]->name;
+	
+	public function getArtists(){
+		$str = '';
+		$count = 0;
+		foreach($this->artists as $artist){
+			if($count>0)
+				$str.=", ";
+			$str.="$artist->name";
+			$count++;
+		} 
+		return $str;
 	}
-	public function getVideo(){
 
-			$width = 415;
-		return "<iframe width='$width' height='315' src='$this->embed?wmode=opaque' frameborder='0' allowfullscreen></iframe>";
-	}
-	
-	public function getTable(){
-		return "
-		<table id='video-info-table'>
-		<tr>
-			<td>Track:</td>
-			<td>$this->track</td>
-		</tr>
-		<tr>
-			<td>Artist:</td>
-			<td>$this->artists</td>
-		</tr>
-		<tr>
-			<td>Album:</td>
-			<td>$this->album</td>
-		</tr>
-		<tr>
-			<td>Release:</td>
-			<td>$this->release</td>
-		</tr>
-		</table>
-		";
-	}
-	
-	public function displaySingle(){
-		$title = get_the_title($this->post->ID);
-		$video = $this->getVideo(500);		
+	public function makeView() {
 		echo "
-		<h1>$title</h1>
-		<div class='single-video'>
-		$video
-		</div>";
-		echo $this->getTable();
-		echo "Categories: ".$this->getCategories();
-		echo the_content($this->post->ID);
+			<div class='item-wrapper video-item-wrapper' id='$this->domID'>
+			<div class='sm-item item album-item'>
+			<div class='inner'>
+			<div class='content'>
+	    		<h4><a href='$this->permalink'>$this->name</a></h4>
+	    	</div> 
+			";
+		echo $this->thumbnail;
+		
+		echo "</div>
+			  </div>
+		      </div>";
+	    $this->getScripts();
+	
 	}
 	
-	public function displaySmall(){
-		echo $this->embed;
-		echo $this->getTable();
-	}
-	
-	private function getThumbnail(){
-		echo "  <div class='video-thumb-overlay'>";
-		the_post_thumbnail( 'video-thumb' ); 
-		echo "	<div class='play-symbol'></div>
-				</div>";
-	}
-	
-	private function getDisplayTitle(){
-		?>
-		<h4><a href="<?php
-				if (get_post_meta($post -> ID, "url", true))
-					echo get_post_meta($post -> ID, "url", true);
-				else
-					the_permalink();
- 					?>"><?php the_title();?></a></h4>
- 		<?php
-	}
-	
-	
-	
-	public function makeVideoBox(){
-	?>
-	
-	<div class="item-wrapper">
-	<div class="sm-item item sm-video" id="<?php echo $this->identity;?>"> 
-		<div class="inner">
-			<?php
-			//print_r($this->post->wpsc-product-category);
-			?>
-			<div class='video-frame'>
-				<?php echo $this->getVideo();?>
-				<div class='video-minimize'>
-					<div class='video-minimize-inner'></div>
+	public function getFullView($echo = true){
+		$image = str_replace("\"","\'",$this->thumbnail);
+		$categories = $this->getCategories();
+		$artists = $this->getArtists();
+		$trackCount = count($this->tracks);
+		$buynow = CartHelper::getBuyNow($this->ID);
+		
+		$view = "
+		<div class='large-item large-video-item' id='$this->fulldomID'>
+			<div class='close'></div>
+			<div class='large-item-inner'>
+				<div class='left-bar'>
+					<h2>$this->name</h2>
+					<div class='album-art'>
+					$image
+					</div>
+					<table class='full-album-meta'>
+			
+					<tr> 
+					 <td class='header'>Artists</td>
+					 <td class='clickable'>$artists</td>
+					</tr>
+				    <tr> 
+					 <td class='header'>Released</td>
+					 <td class='clickable'>$this->released</td>
+					</tr>
+					<tr>
+					 <td class='header'>Genres</td>
+					 <td class='clickable'>$categories</td>
+					</tr>
+					<tr>
+					 <td class='header'>Tracks</td>
+					 <td class='clickable'>$trackCount</td>
+					</tr>
+					</table>
+					$buynow
 				</div>
-			</div>
-			<?php 
-			$this -> getThumbnail();
-			?>
-			<div class="content">
-				<?php //echo $this -> getTable();
-				echo "<p class='title-wrap'>";
-				the_title();
-
-				echo "</p>"; 
-				//echo UI::makePlayButton('#')?>
-			</div>
+				
+			</div>			
 		</div>
-	</div>
-	</div>
-	<script type="text/javascript">
-		 $(document).ready(function () {
-		 	
-		 function minimizeVideos(){
-		 	$(".sm-video").animate({width: 232}, 'slow'); //change size
-			$(".sm-video .video-frame").hide('slow'); //show video frame
-			$(".sm-video .video-thumb-overlay").show(); //hide image
-		 }
-		  $("#<?php echo $this->identity; ?> .video-thumb-overlay").click(function() {
-		  	  //reset all others first
-		  	  minimizeVideos();
-			  //now change individual
-			  $("#<?php echo $this->identity; ?>").animate({width: 417}, 'slow'); //change size
-			  $("#<?php echo $this->identity; ?> .video-frame").show(); //show video frame
-			  $("#<?php echo $this->identity; ?> .video-minimize").show(); //show video minimize button
-			  $(".video-minimize").click(function(){
-			  	minimizeVideos();
-			  });
-			  $("#<?php echo $this->identity; ?> .video-thumb-overlay").hide(); //hide image
-			  
+		"; 	
+		if($echo)
+			echo  trim( preg_replace( '/\s+/', ' ', $view ) );
+		else
+			return  trim( preg_replace( '/\s+/', ' ', $view ) );
+	}
+	
+	public function getScripts(){
+		?>
+		<script>
+		
+		
+			$(document).ready(function(){
+				var holder = "#<?php echo $this->domID; ?>";
+				$(holder+" img").click(function(e){
+					e.preventDefault();
+					ajaxSubmit();
+					// $("#container div").each(
+					// function(){
+						// //$(this).fadeOut('200',function(){
+// 							
+						// });
+						// } 
+					// );
+					showThis("#<?php echo $this->domID; ?>");
+				});
+				
+				  
+				
+								
 			});
-		});
-	</script>
-	<?php }
-}
+			
+		 
+		</script>
+		<?php;
+	}
 
+
+}
 ?>

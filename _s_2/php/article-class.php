@@ -4,41 +4,48 @@ class article{
 	public $ID;
 	public $custom;
 	public $caption;
-	public function __construct($post){
-		$this->post = $post;
-		$this->custom = get_post_custom($this->post->ID);
+	public $thumbnail;
+	public $link;
+	public $date;
+	public function __construct($art){
+		$this->post = $art;
+		$this->ID = $art->ID;
+		$this->custom = get_post_custom($this->ID);
 		$this->caption = $this->custom["post-meta-picturecaption"][0]; 
+		$this->thumbnail = get_the_post_thumbnail($this->ID, 'homepage-thumb' );
+		$this->link = get_permalink($this->ID);
+		$this->date = get_the_date($this->ID); 
 	}
 	
 	public function getCaption(){
 		echo "<p class='single-caption'>$this->caption<p>";
 	}
 	
-	public static function display(){
+	public function display(){
 		?>
 		
-		<div class="sm-item item sm-article">
+		<div class="sm-item item sm-article item-wrapper">
 			<div class="inner">
 		<div class="content">
 		<?php ?>
-	    <h4><a href="<?php if(get_post_meta($post->ID, "url", true)) echo get_post_meta($post->ID, "url", true); else the_permalink(); ?>"><?php the_title(); ?></a></h4>
+	    <h4><a href="<?php if(get_post_meta($this->ID, "url", true)) echo get_post_meta($this->ID, "url", true); else the_permalink($this->ID); ?>"><?php the_title($this->ID); ?></a></h4>
 		 
 	    </div>  
-		    <a class='read-more' href=<?php the_permalink();?>>
+		    <a class='read-more' href=<?php echo $this->link;?>>
 		      <?php 
-		      the_post_thumbnail( 'homepage-thumb' ); 
+		      echo $this->thumbnail;
 		     
 		      ?>
 		    </a>
 	      <div class="content">
 	      	<?php
-	      	$content = $post->post_content;
+	      	$content = $this->post->post_content;
 			$content = apply_filters('the_content', $content);
 			$content = substr($content, 0 , min(strlen($content),40)); 
 			echo $content;
 			?>
-	      	 <a class='read-more' href=<?php the_permalink();?>>Read More</a>  
-	      	 <?php echo the_date();?>   
+	      	 <a class='read-more' href=<?php echo $this->link; ?>>Read More</a>  
+	      	 <?php echo $this->date;?>   
 		   </div> 
 		  
 		     </div>          
@@ -59,6 +66,7 @@ class article{
 			href += "&artist=<?php echo  urlencode($artist); ?>";
 			$(this).attr("href",href);
 			$("#container").remove();
+			addToBodyClass("white"); 
 			$("#main").append("<div id='container'></div>")
 			loadFromInto($(this),"#container");
 		});

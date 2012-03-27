@@ -374,6 +374,19 @@ die();
 add_action('wp_ajax_fetchAlbum', 'fetchAlbum');
 add_action('wp_ajax_nopriv_fetchAlbum', 'fetchAlbum');
 
+function fetchVideo(){
+	
+	$id = $_POST['id'];
+	if($id!=''){
+	$video = DBHelper::getVideo($id);
+	$view = $video ->getFullView(false);
+	echo str_replace("\'", "\"", $view);
+	}
+die();
+}
+add_action('wp_ajax_fetchVideo', 'fetchVideo');
+add_action('wp_ajax_nopriv_fetchVideo', 'fetchVideo');
+
 function displayAlbums(){
 	$genre = $_POST['genre'];
 	$artist = $_POST['artist'];
@@ -386,13 +399,26 @@ die();
 add_action('wp_ajax_displayAlbums', 'displayAlbums');
 add_action('wp_ajax_nopriv_displayAlbums', 'displayAlbums');
 
+function displayVideos(){
+	$genre = $_POST['genre'];
+	$artist = $_POST['artist'];
+	$videos = DBHelper::getVideos($genre, $artist);
+	
+	foreach($videos as $video){
+		$video->makeView();
+	}
+die();
+}
+add_action('wp_ajax_displayVideos', 'displayVideos');
+add_action('wp_ajax_nopriv_displayVideos', 'displayVideos');
+
 function displayArticles(){
 	global $post;
 	$category = $_POST['category'];
 	$artist = $_POST['artist'];
 	$articles = DBHelper::getArticles($category, $artist);
-	foreach($articles as $post){
-		article::display();
+	foreach($articles as $article){
+		$article->display(); 
 	}
 	echo article::getLinkScript($category,$artist);
 	
@@ -400,6 +426,19 @@ die();
 }
 add_action('wp_ajax_displayArticles', 'displayArticles');
 add_action('wp_ajax_nopriv_displayArticles', 'displayArticles');
+
+function loadVideo(){
+	global $post;
+	//extract id form DOM ID of the video holder
+	$id = $_POST['id'];
+	$id = split("_", $id);
+	$id = $id[count($id)-1];
+	$video = dbhelper::getVideo($id);
+	$video->getVideo();
+die();
+}
+add_action('wp_ajax_loadVideo', 'loadVideo');
+add_action('wp_ajax_nopriv_loadVideo', 'loadVideo');
 
 function fetchCartCount(){
 	
