@@ -7,7 +7,11 @@
  */
 
 UI::ajaxheader(); ?>
-
+<script>
+	$(document).ready(function(){
+		location.hash = "<?php echo str_replace(" ", "-", get_the_title()); ?>";
+	});
+</script> 
 		<div id="primary" class="site-content">
 			<div id="content" role="main"> 
 		

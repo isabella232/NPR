@@ -3,9 +3,14 @@
  * Template name: Articles Template
  */
 
-
+$INIT_ARTICLE = $_POST['init_article'];
 UI::ajaxheader();
 ?>
+<script>
+	$(document).ready(function(){
+		window.location.hash = "<?php echo str_replace(" ", "-", "Articles"); ?>";
+	});
+</script> 
 <div id="lh_sidebar">
 
 
@@ -13,11 +18,11 @@ UI::ajaxheader();
 		<?php 
 		echo "<div id='category-tax' class='taxonomy-div'>"; 
 		echo "<h2>Categories</h2>";
-		DBHelper::getArticleCategories();
+			DBHelper::getArticleCategories();
 		echo "</div>";
 	    echo "<div id='artist-tax' class='taxonomy-div'>"; 
 		echo "<h2>Artists</h2>";
-		DBHelper::getPostTaxonomyList('music-artist');
+			DBHelper::getPostTaxonomyList('music-artist');
 		echo "</div>"
 		?>
 		</ul> 
@@ -29,13 +34,33 @@ UI::ajaxheader();
 </div>
 
 <script>
+<?php
+$open_article = $_GET['open_article'];
+if(isset($open_article)):
+?>
 /**
- * load in all articles when page first loads
- */  
-$(document).ready(function(){
-		ajaxLoadArticles("All",'All');
+ * Load the passed article
+ */
+	$(document).ready(function(){
+			var href = "<?php echo get_bloginfo('url').'/?p='.$open_article;?>";
+			href+= "&category=All&artist=All";
+			$("#container").remove();
+			addToBodyClass("white"); 
+			$("#main").append("<div id='container'></div>");
+			setOpen();
+			$("#container").load(href, null, hideAjaxLoader); 
 	});
-	var max_container_height;
+<?php else:?>
+	/**
+	 * load in all articles when page first loads
+	 */  
+	$(document).ready(function(){
+			ajaxLoadArticles("All",'All');
+		});
+		var max_container_height;
+		var fullView = false;
+<?php endif; ?>
+
 /**
  * ajax handle inner links
  */
@@ -60,13 +85,13 @@ $("#artist-tax li a").click(function(e){
 function ajaxLoadArticles(category,artist){
 	if(category!=""){
 		showAjaxLoader();
-		
+		fullView = false;
 		$.ajax({
         url:        '<?php echo get_bloginfo('url')?>/wp-admin/admin-ajax.php',
         type:       'post',
         data:       { "action":"displayArticles", "category":category, "artist":artist},
         success: function(data) {
-        			
+        			window.location.hash = "Articles"
 	   				$("#container").empty();
 			        hideAjaxLoader();
 			        reloadMasonry(data);
@@ -88,6 +113,10 @@ $(document).ready(function(){
 	arrange();
 });
 
+function setOpen(){
+	fullView = true;
+}
+
 $(window).resize(function() {
 	var w = $(window).width() - 240;
   $('#container').width(w);
@@ -95,15 +124,14 @@ $(window).resize(function() {
 });	
 
 function arrange(){
-
-	
-  $('#container').masonry({
-    // options
-    itemSelector : '.item-wrapper', 
-    singleMode : true,
-    isAnimated: true
-  });
-
+	if(fullView==false){	
+	  $('#container').masonry({
+	    // options
+	    itemSelector : '.item-wrapper', 
+	    singleMode : true,
+	    isAnimated: true
+	  });
+	}
 }
 </script>
 <?php UI::ajaxfooter(); ?>

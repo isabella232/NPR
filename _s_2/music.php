@@ -4,8 +4,7 @@
  */
 
 UI::ajaxheader();
-
-	
+$open_album = $_GET['open_album'];
 ?>
 <div id="lh_sidebar">
 	<ul>
@@ -40,17 +39,30 @@ UI::ajaxheader();
 	
 ?>
 <script> 
+<?php
+if(isset($open_album)):
+?>
+	$(document).ready(function(){
+		var id = "<?php echo $open_album; ?>";
+		ajaxSubmit(id);
+	});
+<?php else:?>
 	$(document).ready(function(){
 		ajaxLoadAlbums("All",'null');
 	});
+<?php endif; ?>
  
 var max_container_height;
 /**
  * reposition fullview on resize
  */
 $(window).resize(function(){
-		setUpFullView();
-	});
+		if(fullOpen == true)
+		{
+			var boxH = $(".large-item").first().height();
+			$("#container").height(max_container_height);
+		}
+}); 
 			
 var fullOpen = false;
 /**
@@ -59,7 +71,7 @@ var fullOpen = false;
 function showThis(id){
 	if(fullOpen == false){
 		ajaxSubmit(id);
-	}
+	} 
 	fullOpen = true;
 	
 }
@@ -85,15 +97,18 @@ $("#genre-tax li a").click(function(e){
  */
 function ajaxLoadAlbums(genre,artist){
 				if(genre!=""){
+					
 					showAjaxLoader();
 					$.ajax({
 			        url:        '<?php echo get_bloginfo('url')?>/wp-admin/admin-ajax.php',
 			        type:       'post',
 			        data:       { "action":"displayAlbums", "artist":artist , "genre":genre},
 			        success: function(data) {
+			        	
 			        $("#container").empty();
 			        hideAjaxLoader();
 				    reloadMasonry(data);
+				    hideAjaxLoader();
 				  } 
 			    });				  
 				}
@@ -125,48 +140,58 @@ function ajaxSubmit(id){
  * position the full view and make div heights match
  */
 function setUpFullView(){
-	
-	var position = ( $("#container").width() )/ 2;
-	
-	position = position - ( ($(".large-item").width() )/2 );
-	$(".large-item").css("margin-left",position+"px");
-	var rightH = $(".right-bar").height();
-	var leftH = $(".left-bar").height();
-	var H = Math.max(rightH,leftH);
-	$(".right-bar").height(H);
-	$(".left-bar").height(H);
+	var name = $("#large-item-album-name").attr("Name");
+	if(name!="undefined")
+	window.location.hash = name; 
+	$("#container").height($(".large-item").height()+100); 
+	// var position = ( $("#container").width() )/ 2;
+// 	
+	// position = position - ( ($(".large-item").width() )/2 );
+	// $(".large-item").css("margin-left",position+"px");
+	// var rightH = $(".right-bar").height();
+	// var leftH = $(".left-bar").height();
+	// var H = Math.max(rightH,leftH);
+	// $(".right-bar").height(H);
+	// $(".left-bar").height(H);
 	$(".large-item .close").click(restoreAlbums);
 } 
 /**
  * remove full view and restore albums
  */
 function restoreAlbums(){
+	window.location.hash = "Music"; 
 	fullOpen = false;
 	$(".large-item").remove();
-	$("#container div").each(
-		function(){
-			$(this).fadeIn('200');
-		}
-	);
+	if($(".sm-item").size()>0) //if albums have been loaded in the past
+	{
+		$("#container div").each(
+			function(){
+				$(this).fadeIn('200');
+			}
+		);
+	}	
+	else //else load all albums
+	{
+		ajaxLoadAlbums("All",'null');
+	}	
 }			
 
 $(document).ready(function(){
 	
 	max_container_height = $("#container").height();
 	
-	var w = $(window).width() - 240;
+	var w = $(window).width() - 225;
   $('#container').width(w);
 	arrange();
 });
 
 $(window).resize(function() {
-	var w = $(window).width() - 240;
+	var w = $(window).width() - 225;
   $('#container').width(w);
-	arrange();
+	//arrange();
 });	
 
 function arrange(){
-
 	
   $('#container').masonry({
     // options

@@ -63,7 +63,7 @@ class album {
 	public function makeView() {
 		echo "
 			<div class='item-wrapper' id='$this->domID'>
-			<div class='sm-item item album-item'>
+			<div id='$this->ID' class='sm-item item album-item'>
 			<div class='inner'>
 			<div class='content'>
 	    		<h4><a href='$this->permalink'>$this->name</a></h4>
@@ -83,13 +83,13 @@ class album {
 		$artists = $this->getArtists();
 		$trackCount = count($this->tracks);
 		$buynow = CartHelper::getBuyNow($this->ID);
-		
+		$hashableName = str_replace(" ", "-", $this->name);
 		$view = "
 		<div class='large-item' id='$this->fulldomID'>
 			<div class='close'></div>
 			<div class='large-item-inner'>
 				<div class='left-bar'>
-					<h2>$this->name</h2>
+					<h2 id='large-item-album-name' name='$hashableName'>$this->name</h2>
 					<div class='album-art'>
 					$image
 					</div>
@@ -161,11 +161,11 @@ class album {
 		if ($this -> tracks != NULL)
 		{
 		$list.= "<table class='track-list'>";
-		$list.= "<th></th>"; 
-		$list.= "<th>Track</th>"; 
-		$list.= "<th>Length</th>";
-		$list.= "<th>Artists</th>";
-		$list.= "<th>Purchase</th>";
+		// $list.= "<th></th>"; 
+		// $list.= "<th>Track</th>"; 
+		// $list.= "<th>Length</th>";
+		// $list.= "<th>Artists</th>";
+		// $list.= "<th>Purchase</th>";
 		$list.= "</tr>";
 		
 			$count = 0;
@@ -178,7 +178,7 @@ class album {
 				$list.= "<tr class='$class' id='$track->domID'>";
 					$list.= "<td class='clickable'><img class='grey-play-button' src='$imagedir/button_grey_play.png'></td>";
 					$list.= "<td class='clickable'>$track->name</td>";
-					$list.= "<td class='clickable'>$track->length</td>";
+					// $list.= "<td class='clickable'>$track->length</td>";
 					$list.= "<td class='clickable'>$artists</td>";
 					$list.= "<td class='productcol'>$buynow</td>";
 				$list.= "</tr>";

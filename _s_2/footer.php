@@ -8,7 +8,13 @@
  * @since _s 1.0
  */
 ?>
-
+	<?php 
+	/**
+	 * GLOBAL SWITCH FOR AJAX PAGE LOADING
+	 */
+		global $ajax_is_on; 
+		$ajax_is_on = true; 
+	?>
 	</div><!-- #main -->
 	<footer id="colophon" class="site-footer" role="contentinfo">
 		
@@ -36,12 +42,16 @@
  * listen for product form submissions
  */
 $("form.product_form").live("submit", function(){
-$.ajax({
+updateCart();
+});	
+
+function updateCart(){
+	$.ajax({
 		        url:        '<?php echo get_bloginfo('url')?>/wp-admin/admin-ajax.php',
 		        type:       'post',
 		        data:       { "action":"fetchCartCount"},
 		        success: function(data) {
-		        		$("#cart-count .text").slideUp('slow', function(){
+		        		    $("#cart-count .text").slideUp('slow', function(){
 		        			$("#cart-count .text").remove();
 		        			$("#cart-count").append("<div class='text'></div>");
 		        			$("#cart-count .text").text(data);
@@ -50,7 +60,7 @@ $.ajax({
 			    		
 				    }
 				 });
-});	
+}
 
 /**
  * player scripts

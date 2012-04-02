@@ -139,14 +139,15 @@ function jalert($var) {
 add_theme_support( 'post-thumbnails' );
 add_image_size( 'homepage-thumb', 220, 180, true );
 add_image_size( 'article-thumb', 400, 180, false );
-add_image_size( 'album-thumb', 200, 200, false );
+add_image_size( 'article-large-thumb', 400, 180, true );
+add_image_size( 'album-thumb', 250, 250, false );
 add_image_size( 'video-thumb', 230, 200, true ); 
 add_image_size( 'related-thumb', 180, 120, true ); 
 add_image_size( 'full', 700, 420, true ); 
 include "php/video-class.php";
 include "php/ui-class.php";
 include "php/player-class.php";
-include "php/album-class.php";
+include "php/album-class.php"; 
 include "php/article-class.php";
 include "php/options.php";
 include "php/dbhelper.php";

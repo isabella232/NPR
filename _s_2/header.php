@@ -119,13 +119,7 @@
 	/**
 	 * scripts to capture menu clicks
 	 */
-	<?php 
-	/**
-	 * GLOBAL SWITCH FOR AJAX PAGE LOADING
-	 */
-		global $ajax_is_on; 
-		$ajax_is_on = true; 
-	?>
+
 	/**
 	 * function for loading the href off an element into the passed target div
 	 */
@@ -136,9 +130,9 @@
 		var title = from.text();
 	  	showAjaxLoader();
 	  	location.hash = title;
-	  	
 	  	into.load(href, null, hideAjaxLoader); 
 	}
+
 	
 	jQuery(".menu-item a").click(function(event) {
 	  event.preventDefault();
@@ -146,6 +140,18 @@
 	  jQuery(this).parent().addClass("current_page_item ");
 	  loadFromInto(jQuery(this),"#main");
 	});
+	/**
+	 * make the top nav appear to change
+	 */
+	function setCurrentMenu(text){
+		stripCurrentClasses();
+		$(".menu-item a").each(function(){
+			if($(this).text()==text)
+				$(this).addClass("current_page_item");
+			else
+				$(this).removeClass("current_page_item");
+		});
+	}
 	
 	function stripCurrentClasses(){
 		jQuery(".menu li").each(function(){

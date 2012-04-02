@@ -134,13 +134,6 @@ class video {
 				$(holder+" img").click(function(e){
 					e.preventDefault();
 					ajaxSubmit();
-					// $("#container div").each(
-					// function(){
-						// //$(this).fadeOut('200',function(){
-// 							
-						// });
-						// } 
-					// );
 					showThis("#<?php echo $this->domID; ?>");
 				});
 				

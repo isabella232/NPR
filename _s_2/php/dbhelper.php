@@ -1,5 +1,5 @@
 <?php
-
+ 
 
 function get_category_id($cat_name){
 	$term = get_term_by('name', $cat_name, 'category');
@@ -134,7 +134,7 @@ class DBHelper {
 			foreach($posts as $post){
 				$valid_artist = false;
 				$cats = wp_get_post_terms($post->ID, 'music-artist', array("fields" => "all"));
-				$current = new article($post);
+				$current = new article($post->ID);
 				foreach($cats as $cat)
 				{
 					if($cat->name == $artist)
@@ -149,12 +149,32 @@ class DBHelper {
 		else{
 			$article_posts = array();
 			foreach($posts as $post){
-				$current = new article($post);
+				$current = new article($post->ID);
 				$article_posts [] = $current;
 			}
 			return $article_posts;
 		}
 			
+	}
+
+	public static function getLatestArticles($number = 1){
+		global $post; 
+		$oldpost = $post;
+		$args = array('posttype' => 'post', 'numberposts'  => $number);
+			// The Query
+		$the_query = new WP_Query( $args );
+		$articles = array();
+		// The Loop
+		$count = 0;
+		while ( $the_query->have_posts() ) : $the_query->the_post();
+			$current = new article($the_query->post->ID);
+			if($count < $number)
+				$articles [] = $current;
+			$count++;
+		endwhile;
+		// Reset Post Data
+		wp_reset_postdata();
+		return $articles;
 	}
 	
 	public static function getArticleCategories(){
@@ -166,7 +186,7 @@ class DBHelper {
 		echo "<li><a href='$url&cat=All' class='category' name='All'>All</a></li>";
 		foreach ($terms as $term) {
 			if($term->name!="Uncategorized")
-			echo "<li><a href='$url&cat=$term->name' class='category' name='$term->name'>$term->name</a></li>";
+			echo "<li><a href='$url&cat=$term->name' class='category $term->name' name='$term->name'>$term->name</a></li>";
 		}
 	}
 	
@@ -191,7 +211,7 @@ class DBHelper {
 		//clean out duplicates
 			$labels  = array_unique($labels);		
 		foreach($labels as $label){
-			echo "<li><a href='#'>$label</a></li>";
+			echo "<li><a href='#' class='$label'>$label</a></li>";
 		}
 	}
 	/**

@@ -61,8 +61,6 @@ class player {
 				    <span class="separator sep-2"></span>
 				 
 				    <!--full screen toggle-->
-				    <a href="javascript:;" class="jp-full-screen" tabindex="1" title="full screen">full screen</a>
-				    <a href="javascript:;" class="jp-restore-screen" tabindex="1" title="restore screen">restore screen</a>
 				
 		        </div><!--end jp-controls-holder-->
 		    </div><!--end jp-interface-->
