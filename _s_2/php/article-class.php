@@ -51,7 +51,7 @@ class article{
 	    <h4><a href="<?php the_permalink($this->ID); ?>"><?php the_title($this->ID); ?></a></h4>
 		 
 	    </div>  
-		    <a class='read-more' href=<?php echo $this->link;?>>
+		    <a class='read-more' title="page-white"  href=<?php echo $this->link;?>>
 		      <?php 
 		      echo $this->thumbnail;
 		     
@@ -64,7 +64,7 @@ class article{
 			$content = substr($content, 0 , min(strlen($content),40)); 
 			echo $content;
 			?>
-	      	 <a class='read-more' href=<?php echo $this->link; ?>>Read More</a>  
+	      	 <a class='read-more' title="page-white" href=<?php echo $this->link; ?>>Read More</a>  
 	      	 <?php echo $this->date;?>   
 		   </div> 
 		  
@@ -89,7 +89,9 @@ class article{
 			addToBodyClass("white"); 
 			$("#main").append("<div id='container'></div>");
 			setOpen();
+			addToBodyClass("white");
 			loadFromInto($(this),"#container");
+			
 		});
 		
 		

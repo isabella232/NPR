@@ -17,15 +17,35 @@ class UI{
 	}
 	
 	public static function ajaxheader(){
-		global $ajax_is_on;
-		if($ajax_is_on) 
-		get_header(); 
+		
+		$ajax_is_on = $_COOKIE['ajax_is_on'];
+		if($ajax_is_on!="true" or Prefs::usingAjaxPreferred()==false) 
+			get_header(); 
 	}
-	public static function ajaxfooter(){
-		global $ajax_is_on;
-		if($ajax_is_on)  
-		get_footer(); 
+	public static function ajaxfooter(){ 
+		$ajax_is_on = $_COOKIE['ajax_is_on'];
+		if($ajax_is_on!="true" or Prefs::usingAjaxPreferred()==false) 
+			get_footer(); 
 	} 
+	
+	public static function setBlack(){
+		?>
+		<script>
+			$(document).ready(function{
+				addToBodyClass("black"); 
+			});
+		</script>
+		<?php
+	}
+	public static function setWhite(){
+		?>
+		<script>
+			$(document).ready(function{
+				addToBodyClass("white"); 
+			});
+		</script>
+		<?php
+	}
 }
 
 ?>

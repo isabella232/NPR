@@ -71,6 +71,10 @@
 		<p class="nocomments"><?php _e( 'Comments are closed.', '_s' ); ?></p>
 	<?php endif; ?>
 
-	<?php comment_form(); ?>
+	<?php 
+	comment_form(); 
+	nprcomments::getCommentScript();
+	
+	?>
 
 </div><!-- #comments .comments-area -->

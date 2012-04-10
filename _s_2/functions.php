@@ -143,14 +143,19 @@ add_image_size( 'article-large-thumb', 400, 180, true );
 add_image_size( 'album-thumb', 250, 250, false );
 add_image_size( 'video-thumb', 230, 200, true ); 
 add_image_size( 'related-thumb', 180, 120, true ); 
+add_image_size( 'default-product-thumb', 300); 
 add_image_size( 'full', 700, 420, true ); 
 include "php/video-class.php";
+include "php/nprcomments-class.php";
+include "php/nprproduct-class.php";
 include "php/ui-class.php";
 include "php/player-class.php";
 include "php/album-class.php"; 
 include "php/article-class.php";
+include "php/carthelper-class.php";
 include "php/options.php";
 include "php/dbhelper.php";
+include "php/prefs-class.php";
 include "php/jplayer/jplayer.php";
 include "php/nprwidgets/npr_shopping_cart_widget.php";
 
@@ -161,13 +166,42 @@ register_taxonomy("music-artist", array( 'post', 'wpsc-product' ), array("hierar
 register_taxonomy("music-category", array( 'post', 'wpsc-product' ), array("hierarchical" => true, "label" => "Music Genres", "singular_label" => "Category", "rewrite" => true));   
 
 /**
- * add custom fields
+ * add meta boxes for default product template
+ *  $custom = get_post_custom($post->ID);  
+		// $ticked = explode(",",$custom["product-categories-to-display"][0]);
+        // $post_id = $_GET['post'] ? $_GET['post'] : $_POST['post_ID'] ;
+		// $template_file = get_post_meta($post_id,'_wp_page_template',TRUE);
+		$template_file = 'default_product.php'; //TODO remove
+	  	// check for a template type
+	  	if ($template_file == 'default_product.php'):
  */
-//add_action("admin_init", "portfolio_meta_box");     
 
+
+add_action('save_post', 'npr_save_defaultproduct_meta');   
 /**
- * save data
+ * See which checkboxes are checked and save their states
  */
+function npr_save_defaultproduct_meta(){  
+    global $post;    
+  	$id = $post->ID;
+    if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ){  
+        return $post_id;  
+    }else{
+    	$cats = dbhelper::getProductCategories();
+		$csv="";
+		$count=0;
+		foreach($cats as $cat){
+			if(isset($_POST["$cat"])){
+			if($count>0)
+				$csv.=","; 
+			$csv.= "$cat";
+			$count++;
+			}
+		}
+    	update_post_meta($id, "default-product-meta",$csv);    
+    }  
+}
+
 add_action('save_post', 'npr_save_product_meta');   
 
 function npr_save_product_meta(){  
@@ -182,7 +216,6 @@ function npr_save_product_meta(){
         update_post_meta($post->ID, "video-meta-artists", $_POST["video-meta-artists"]);  
         update_post_meta($post->ID, "video-meta-length", $_POST["video-meta-length"]);  
         update_post_meta($post->ID, "video-meta-album", $_POST["video-meta-album"]);  
-
     }  
 }
 add_action('save_post', 'npr_save_album_meta');   
@@ -211,12 +244,31 @@ function npr_save_post_meta(){
 /** 
  * Add metaboxes
  */
+//TODO return true for now until fixed
+function is_in_terms($my_term, $terms){
+	foreach($terms as $term){
+		if(strcasecmp($term->name, $myterm)) 
+			return true;
+	}
+	return true;
+}
+ 
+add_action("admin_init", "npr_default_box");     
+  
+function npr_default_box(){
+	global $post; 
+    add_meta_box("default-product-meta", "Product Categories To Display", "default_product_meta_options", "page", "side", "high");  
+}    
+  
+ 
 add_action("admin_init", "npr_album_box");     
   
 function npr_album_box(){
 	global $post; 
 	//get the category
-	$terms = get_terms("wpsc_product_category");
+	$terms = wp_get_post_terms("wpsc_product_category");
+	//apply meta box for video category
+	if(is_in_terms('track',$terms))
     add_meta_box("album-meta", "Album Information", "npr_album_meta_options", "wpsc-product", "side", "high");  
 }    
   
@@ -226,7 +278,9 @@ add_action("admin_init", "npr_meta_box");
 function npr_meta_box(){
 	global $post;
 	//get the category
-	$terms = get_terms("wpsc_product_category");
+	$terms = wp_get_post_terms("wpsc_product_category");
+	//apply meta box for video category
+	if(is_in_terms('video',$terms))
     add_meta_box("video-meta", "Track Information", "npr_video_meta_options", "wpsc-product", "side", "high");  
 }  
   
@@ -235,6 +289,35 @@ add_action("admin_init", "npr_post_meta_box");
 function npr_post_meta_box(){
     add_meta_box("featuredimage-meta", "Featured Image Settings", "npr_post_meta_options", "post", "side", "high");  
 } 
+
+function default_product_meta_options(){  
+        global $post;  
+        if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ) return $post_id;  
+        $custom = get_post_custom($post->ID);  
+       
+?> 
+<form>
+	<table> 
+	    	<?php
+	    	$ticked = array();
+			$ticked = explode(",",$custom["default-product-meta"][0]);
+	    	$cats = dbhelper::getProductCategories();
+			foreach($cats as $cat):
+				$isTicked = false;
+				echo "<tr> <td> <input type='checkbox' name='$cat' id='$cat'";
+					foreach($ticked as $tick){
+						if($cat==$tick)
+							$isTicked = true;
+					}
+					if($isTicked)
+					echo " checked='checked' " ;
+				echo "/> $cat </td> </tr>";	
+			endforeach;
+	    	?>
+	</table>
+</form>
+<?php   
+}    
 
 function npr_post_meta_options(){  
         global $post;  
@@ -248,7 +331,7 @@ function npr_post_meta_options(){
     </tr>
 </table>
 <?php   
-    }    
+}    
   
 function npr_album_meta_options(){  
         global $post;  
@@ -400,6 +483,18 @@ die();
 add_action('wp_ajax_displayAlbums', 'displayAlbums');
 add_action('wp_ajax_nopriv_displayAlbums', 'displayAlbums');
 
+function displayProducts(){
+	$categories = $_POST['categories'];
+	$categories = explode(',',$categories);
+	$products = DBHelper::getProducts($categories);
+	foreach($products as $product){
+		$product->makeView();
+	} 
+die();
+}
+add_action('wp_ajax_displayProducts', 'displayProducts');
+add_action('wp_ajax_nopriv_displayProducts', 'displayProducts');
+
 function displayVideos(){
 	$genre = $_POST['genre'];
 	$artist = $_POST['artist'];
@@ -449,3 +544,50 @@ die();
 }
 add_action('wp_ajax_fetchCartCount', 'fetchCartCount');
 add_action('wp_ajax_nopriv_fetchCartCount', 'fetchCartCount');
+/**
+ * AJAXifiy comments
+ */
+
+ 
+/**
+ * on activation of theme hooks
+ */
+
+$started = get_option( 'npr_started', false );
+if($started == false)
+{
+	//go about initialising the theme
+	add_option( 'npr_started', true );
+	//add the default pages
+	$page_ids = array();
+	$page_ids[] = add_npr_page('Home','homepage.php');
+	$page_ids[] = add_npr_page('Articles','articles.php');
+	$page_ids[] = add_npr_page('Videos','videos.php');
+	$page_ids[] = add_npr_page('Music','music.php');
+	//register the custom menu
+	//register_nav_menu( 'npr_theme_menu', 'Custom Theme Menu' );
+}
+/**
+ * add a page to database and return ID
+ */
+function add_npr_page($title, $template){
+	// Create post object
+	  $my_post = array(
+	 'post_title' => $title,
+	 'post_status' => 'publish',
+	 'post_author' => 1,
+	 'post_type' => 'page'
+	  );
+	
+	// Insert the post into the database and return ID
+	$my_post_id = wp_insert_post( $my_post );
+	//set the template
+	if($my_post_id) {
+	  update_post_meta($my_post_id, '_wp_page_template',  $template);
+	}
+	//return the id 
+	return $my_post_id;
+}
+
+
+

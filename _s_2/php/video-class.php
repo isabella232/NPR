@@ -127,22 +127,26 @@ class video {
 	public function getScripts(){
 		?>
 		<script>
-		
-		
 			$(document).ready(function(){
 				var holder = "#<?php echo $this->domID; ?>";
 				$(holder+" img").click(function(e){
 					e.preventDefault();
-					ajaxSubmit();
-					showThis("#<?php echo $this->domID; ?>");
+					if(getFullOpen()==false)
+					{
+						ajaxSubmit();
+						showThis("#<?php echo $this->domID; ?>");
+					}
+					else
+					{
+						restoreCurrentOpen()
+						restoreAlbums();
+						fullOpen = false;
+						$.when(restoreCurrentOpen()).then(ajaxSubmit()).then(showThis("#<?php echo $this->domID; ?>"));
+					}
 				});
-				
-				  
 				
 								
 			});
-			
-		 
 		</script>
 		<?php;
 	}

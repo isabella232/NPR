@@ -6,97 +6,6 @@ function get_category_id($cat_name){
 	return $term->term_id;
 }
 
-class CartHelper{
-	public static function getCartIcon(){
-		$checkout = self::getCheckoutURL();
-		$count = wpsc_cart_item_count();
-		echo "
-		<div id='cart-icon-wrapper'> 
-			<div id='cart-count'>
-				<div id='cart-count-text' class='text'>
-				$count
-				</div>
-			</div>
-			<a id='cart-icon-button-link' href='$checkout' target='blank'>
-			<div id='cart-icon'></div>
-			</a>
-		</div>
-		 ";?>
-		 <script>
-		 var button = $("#cart-icon-button-link");
-		 var display = $("#cart-count-text");
-		 var count = display.text();
-		 button.click(function(e){
-		 	e.preventDefault();
-			if(count>0)
-				window.location.href = button.attr('href');
-			else
-				alert("Sorry your cart is empty");		 	
-		 });
-		 </script>
-		 <?php
-	}
-	
-	public static function echoBuyNow($id){
-		?> 
-		<div class="wpsc_buy_button_container">
-           <?php if(wpsc_product_external_link($id) != '') : ?>
-           <?php $action = wpsc_product_external_link( $id ); ?>
-           <input class="wpsc_buy_button" type="submit" value="<?php echo wpsc_product_external_link_text( $id, __( 'Buy Now', 'wpsc' ) ); ?>" onclick="return gotoexternallink('<?php echo $action; ?>', '<?php echo wpsc_product_external_link_target( $id ); ?>')">
-           <?php else: ?>
-          <input type="submit" value="<?php _e('Add To Cart', 'wpsc'); ?>" name="Buy" class="wpsc_buy_button" id="product_<?php echo $id; ?>_submit_button"/>
-           <?php endif; ?>
-          <div class="wpsc_loading_animation">
-           <img title="Loading" alt="Loading" src="<?php echo wpsc_loading_animation_url(); ?>" />
-           <?php _e('Updating cart...', 'wpsc'); ?>
-          </div><!--close wpsc_loading_animation-->
-         </div><!--close wpsc_buy_button_container-->
-		<?
-	}
-	
-	public static function getBuyNow($id){
-		// ob_start();
-		// CartHelper::echoBuyNow($id);
-		// $buynow = ob_get_contents();
-		// ob_end_clean();
-		$price = get_post_meta( $id, '_wpsc_price', true );
-	
-		 $action =  wpsc_product_external_link(wpsc_the_product_id());
-         $action = htmlentities(wpsc_this_page_url(), ENT_QUOTES, 'UTF-8' );
-		$buynow = '<form class="product_form" enctype="multipart/form-data" action="'.$action.'" method="post" name="product_'.$id.'" id="product_'.$id.'">
-                                                 
-       <!-- THIS IS THE QUANTITY OPTION MUST BE ENABLED FROM ADMIN SETTINGS -->
-       
-       <div class="wpsc_product_price">
-                                  <p class="pricedisplay product_'.$id.'">Price: <span id="product_price_'.$id.'" class="currentprice pricedisplay">'.$price.'</span></p>
-                  
-         <!-- multi currency code -->
-                  
-                   <p class="pricedisplay" style="display:none;">Shipping:<span class="pp_price"><span class="pricedisplay">'.$price.'</span></span></p>
-                
-               </div><!--close wpsc_product_price-->
-       
-       <input type="hidden" value="add_to_cart" name="wpsc_ajax_action">
-       <input type="hidden" value="'.$id.'" name="product_id">
-     
-       <!-- END OF QUANTITY OPTION -->
-                        <div class="wpsc_buy_button_container">
-          <div class="wpsc_loading_animation">
-           <img title="Loading" alt="Loading" src="http://jackmahoney.co.nz/npr/wp-content/plugins/wp-e-commerce/wpsc-theme/wpsc-images/indicator.gif">
-           Updating cart…          </div><!--close wpsc_loading_animation-->
-                     <input type="submit" value="Add To Cart" name="Buy" class="wpsc_buy_button" id="product_'.$id.'_submit_button">
-                      </div><!--close wpsc_buy_button_container-->
-                      <div class="entry-utility wpsc_product_utility">
-               </div>
-             </form>';
-		
-		return $buynow;
-	}
-	
-	public static function getCheckoutURL(){
-		return get_option('shopping_cart_url');
-	}
-}
 
 class DBHelper {
 	/**
@@ -188,6 +97,30 @@ class DBHelper {
 			if($term->name!="Uncategorized")
 			echo "<li><a href='$url&cat=$term->name' class='category $term->name' name='$term->name'>$term->name</a></li>";
 		}
+	}
+	
+	/**
+	 * echos out a list of categories based on passed product type and taxonomy name
+	 */
+	public static function getProductCategories(){
+		//create cat array	
+		$labels = array();
+		//query db
+		$args = array('post_type' => 'wpsc-product', 'numberposts' => 200000);
+		$the_query = new WP_Query($args);
+		//iterate products
+		while ($the_query -> have_posts()) :
+			$the_query -> the_post();
+			$categories = wp_get_post_terms($the_query->post->ID, 'wpsc_product_category', array("fields" => "all"));
+			// add to labels even if NOT new
+			foreach($categories as $cat){
+				 $labels [] = $cat->name;
+			 } 
+		endwhile;
+		//clean out duplicates
+		$labels  = array_unique($labels);		
+		return $labels;
+		wp_reset_query();
 	}
 	
 	/**
@@ -457,6 +390,27 @@ class DBHelper {
 		endwhile;
 		$post = $TEMP;
 		return $albums;
+	}
+
+	/**
+ 	* query albums and return album array 
+ 	*/
+	public static function getProducts($chosen_categories) {
+		$args = array('post_type' => 'wpsc-product', 'numberposts' => 20000);	
+		$my_posts = get_posts($args);
+		$valid_posts = array();
+		foreach($my_posts as $the_post){
+			$valid = false;
+			$categories = wp_get_post_terms($the_post->ID, 'wpsc_product_category', array("fields" => "all"));
+			foreach($categories as $cat)
+			{
+				if(in_array($cat->name, $chosen_categories, true))
+				$valid = true;
+			}
+			if($valid)
+			$valid_posts [] = new nprproduct($the_post); 
+		}
+		return $valid_posts;
 	}
 
 }

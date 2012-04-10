@@ -2,6 +2,7 @@
 /**
  * override the plugins shopping cart page
  */
+get_header();
 global $wpsc_cart, $wpdb, $wpsc_checkout, $wpsc_gateway, $wpsc_coupons;
 $wpsc_checkout = new wpsc_checkout();
 $wpsc_gateway = new wpsc_gateways();
@@ -14,6 +15,14 @@ if(wpsc_cart_item_count() < 1) :
    return;
 endif;
 ?>
+<script>
+	$(document).ready(function(){
+		//remove the header and footer
+		$("#masthead").remove();
+		$("#colophon").remove();
+		$("")
+	});
+</script>
 <div id="checkout_page_container">
 	<h1>Jacks Check Out</h1>
 <h3><?php _e('Please review your order', 'wpsc'); ?></h3>

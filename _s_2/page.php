@@ -11,10 +11,14 @@
  * @since _s 1.0
  */
 $product_category = $_GET['wpsc_product_category'];
-get_header(); ?>
+UI::ajaxheader(); ?>
+<script>
+	//added in page.php
+	//addToBodyClass("page-white");
+</script>
 <!-- using page.php -->
-		<div id="primary" class="site-content">
-			<div id="content" role="main">
+		<div id='single-post'>
+			<div class='post-wrap'>
 
 				<?php while ( have_posts() ) : the_post(); ?>
 
@@ -27,5 +31,5 @@ get_header(); ?>
 			</div><!-- #content -->
 		</div><!-- #primary .site-content -->
 
-
-<?php get_footer(); ?>
+<?php 
+UI::ajaxfooter(); ?>

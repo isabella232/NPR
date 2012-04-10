@@ -45,7 +45,7 @@ if(isset($open_article)):
 			var href = "<?php echo get_bloginfo('url').'/?p='.$open_article;?>";
 			href+= "&category=All&artist=All";
 			$("#container").remove();
-			addToBodyClass("white"); 
+			addToBodyClass("page-white");  
 			$("#main").append("<div id='container'></div>");
 			setOpen();
 			$("#container").load(href, null, hideAjaxLoader); 

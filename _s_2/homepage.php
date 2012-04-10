@@ -5,9 +5,7 @@
 ?>
 
 <?php 
-global $ajax_is_on;
-if($ajax_is_on==false)
-get_header(); ?>
+UI::ajaxheader(); ?>
 <div id='homepage'>
 	<h1>Articles</h1>
 	<div >
@@ -90,5 +88,4 @@ function fadeInItems(){
 
 </script>
 <?php 
-if($ajax_is_on==false)
-get_footer(); ?>
+UI::ajaxfooter(); ?>

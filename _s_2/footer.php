@@ -8,13 +8,6 @@
  * @since _s 1.0
  */
 ?>
-	<?php 
-	/**
-	 * GLOBAL SWITCH FOR AJAX PAGE LOADING
-	 */
-		global $ajax_is_on; 
-		$ajax_is_on = true; 
-	?>
 	</div><!-- #main -->
 	<footer id="colophon" class="site-footer" role="contentinfo">
 		
@@ -23,19 +16,26 @@
 		</div><!-- .site-info -->
 		<?php
 		CartHelper::getCartIcon();
-		//the_widget('WP_Widget_Shopping_Cart'); 
 		?>
 	</footer><!-- .site-footer .site-footer -->
-</div><!-- #page .hfeed .site -->
+</div><!-- #page .hfeed .site -->  
 
 <?php wp_footer(); ?>
 
 <script type="text/javascript" src="<?php bloginfo('template_directory');?>/js/jQuery.jPlayer.2.1.0/jquery.jplayer.min.js"></script>
 <link type="text/css" REL=StyleSheet href="<?php bloginfo('template_directory');?>/js/jQuery.jPlayer.2.1.0/css/styles.css"/>
-
+<script src="<?php echo get_bloginfo('template_url');?>/js/jquery.cookie.js"></script>
 <script>
-	
-	
+/**
+ * set cookie on begin
+ */
+$(document).ready(function(){
+	$.cookie('ajax_is_on', "true");
+	//set menu height to match masthead
+	var mast = $("#masthead").height();
+	$(".main-navigation .menu a").css("line-height",mast+"px");
+	$(".site-description").css("line-height",mast+"px");
+});	
 
 
 /**

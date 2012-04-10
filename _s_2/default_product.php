@@ -1,25 +1,15 @@
 <?php 
 /**
- * Template name: Video Template
+ * Template name: Default Product Template
  */
-
+global $post;
 UI::ajaxheader();
 
-	
+$custom = get_post_custom($post->ID);  
+$cats_to_display = $custom["default-product-meta"][0];
 ?>
 <div id="lh_sidebar">
 	<ul>
-		<?php 
-		echo "<div id='genre-tax' class='taxonomy-div'>";
-		echo "<h2>Genres</h2>";
-		DBHelper::getTaxonomyList('video','music-category');
-		echo "</div>";
-		echo "<div id='artist-tax' class='taxonomy-div'>";
-		echo "<h2>Artists</h2>";
-		DBHelper::getTaxonomyList('video','music-artist');
-		echo "</div>"
-	
-		?>
 	</ul>
 </div>
 <div id="container">
@@ -30,7 +20,9 @@ UI::ajaxheader();
 
 <script> 
 	$(document).ready(function(){
-		ajaxLoadVideos("All",'null');
+		var categories = '<? echo $cats_to_display;?>';
+		console.log("default logged "+categories);
+		ajaxLoadProducts(categories);
 	});
  
 var max_container_height;
@@ -109,32 +101,19 @@ function loadVideo(ID){
 	});
 	hideAjaxLoader(); 
 }
-$("#artist-tax li a").click(function(e){
-	e.preventDefault();
-	var value = $(this).text();
-	removeCurrentClass();
-	$(this).addClass("current");
-	ajaxLoadVideos('null',value);
-});
-$("#genre-tax li a").click(function(e){
-	e.preventDefault();
-	var value = $(this).text();
-	removeCurrentClass();
-	$(this).addClass("current");
-	ajaxLoadVideos(value,'null');
-});
+
 
 
 /**
  * make ajax call to load a series of albums
  */
-function ajaxLoadVideos(genre,artist){
-				if(genre!=""){
+function ajaxLoadProducts(categories){
+				if(categories!=""){
 					showAjaxLoader();
 					$.ajax({
 			        url:        '<?php echo get_bloginfo('url')?>/wp-admin/admin-ajax.php',
 			        type:       'post',
-			        data:       { "action":"displayVideos", "artist":artist , "genre":genre},
+			        data:       { "action":"displayProducts", "categories":categories},
 			        success: function(data) {
 			        $("#container").empty();
 			        hideAjaxLoader();

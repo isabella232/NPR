@@ -42,8 +42,8 @@ function _s_theme_options_init() {
 	// Register our individual settings fields
 	add_settings_field(
 		'sample_checkbox', // Unique identifier for the field for this section
-		__( 'Sample Checkbox', '_s' ), // Setting field label
-		'_s_settings_field_sample_checkbox', // Function that renders the settings field
+		__( 'AJAX settings', '_s' ), // Setting field label
+		'	', // Function that renders the settings field
 		'theme_options', // Menu slug, used to uniquely identify the page; see _s_theme_options_add_page()
 		'general' // Settings section. Same as the first argument in the add_settings_section() above
 	);
@@ -181,7 +181,7 @@ function _s_settings_field_sample_checkbox() {
 	?>
 	<label for"sample-checkbox">
 		<input type="checkbox" name="_s_theme_options[sample_checkbox]" id="sample-checkbox" <?php checked( 'on', $options['sample_checkbox'] ); ?> />
-		<?php _e( 'A sample checkbox.', '_s' );  ?>
+		<?php _e( 'Load header and footer only once.', '_s' );  ?>
 	</label>
 	<?php
 }

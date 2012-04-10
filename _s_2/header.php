@@ -7,6 +7,12 @@
  * @package _s
  * @since _s 1.0
  */
+
+ 	/**
+	 * GLOBAL SWITCH FOR AJAX PAGE LOADING
+	 */
+		global $ajax_is_on; 
+ 
 ?><!DOCTYPE html>
 <html <?php language_attributes(); ?>>
 <head>
@@ -39,20 +45,19 @@
 <script src="<?php echo get_template_directory_uri(); ?>/js/html5.js" type="text/javascript"></script>
 <![endif]-->
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+<script src="http://bxslider.com/sites/default/files/jquery.bxSlider.min.js" type="text/javascript"></script>
+<script src="/npr/wp-content/themes/_s_2/js/masonry.js"></script>
 <script>
-	/**
-	 * scripts to show ajax loading gif
-	 */
-	// $("a").click(function(e){
-		// e.preventDefault();
-		// alert("clicked");
-		// loadFromInto($(this), "#main");
-	// });
 
-		/**
-	 * called by pages using masonry to reload ajax appended divs
+	log("Loading header.php");
+	/**
+	 * Debugging function	
 	 */
-	function reloadMasonry(data){
+	function log(x){
+		console.log(x);
+	}
+	
+	function reloadMasonry(data){ 
 		$('#container').masonry({
 		    // options  
 		    itemSelector : ".item-wrapper" , 
@@ -64,15 +69,18 @@
 		$.when($("#container").masonry('reload')).then($(".item-wrapper").animate( {opacity:1}, 500 ));
 		addToBodyClass("black"); 
 	}	 	 
-	 
+	/**
+	 * add a class to page to help indentify via ajax
+	 */
 	function addToBodyClass(theClass){
+		log("addToBody");
 		$("body").removeClass(); //remove all
 		$("body").addClass(theClass);
 	}
 	jQuery(document).ready(function(){ 
-		jQuery("body").append("<div id='ajaxloaderdiv'></div>");
-		
+		jQuery("body").append("<div id='ajaxloaderdiv'></div>");//create the ajax loader
 	});
+
 	function showAjaxLoader(){
 		jQuery("#ajaxloaderdiv").show();
 	}
@@ -92,17 +100,30 @@
 	});
 	}
 </script>
-<?php wp_head(); ?>
+<?php wp_head(); 
+Prefs::getStyles();?>
 </head> 
 
 <body <?php body_class(); ?>>
+<!-- handle the window/tab close and delete cookie -->
+<script>
+  window.onbeforeunload = function (e) {
+        e = e || window.event;
+        document.cookie = "ajax_is_on" + '=; expires=Thu, 01-Jan-70 00:00:01 GMT;';
+        console.log("Deleting cookie");
+    };
+</script>
 <div id="page" class="hfeed site">
 	<?php do_action( 'before' ); ?>
 	<header id="masthead" class="site-header" role="banner">
 		<hgroup>
 			<span class="site-title">
-				<a href="<?php echo home_url( '/' ); ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>" rel="home"><?php bloginfo( 'name' ); ?></a>
-				
+				<a href="<?php echo home_url( '/' ); ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>" rel="home">
+					<?php 
+					Prefs::getLogo();
+					?>
+				</a>
+				 
 			</span>
 			<span class="site-description">
 				<?php bloginfo( 'description' ); ?>
@@ -116,24 +137,29 @@
 			<?php wp_nav_menu( ); ?>
 		</nav>
 <script>
-	/**
-	 * scripts to capture menu clicks
-	 */
 
 	/**
+	 * comment scripts
+	 */
+	$("#commentform").submit(function(event){
+		event.preventDefault();
+		alert("Clicked submit");
+	});
+	/**  
 	 * function for loading the href off an element into the passed target div
 	 */
 	function loadFromInto(fromElem, intoElem){
 		var from = jQuery(fromElem); 
 		var into = jQuery(intoElem);
 		var href = from.attr("href");
-		var title = from.text();
+		var title = from.attr("title");
+		addToBodyClass(title); //set body class to the menu item name
 	  	showAjaxLoader();
 	  	location.hash = title;
 	  	into.load(href, null, hideAjaxLoader); 
 	}
 
-	
+	   
 	jQuery(".menu-item a").click(function(event) {
 	  event.preventDefault();
 	  stripCurrentClasses();
