@@ -1,12 +1,7 @@
-<?php 
-/**
- * Template name: Default Product Template
- */
+<?php
 global $post;
 UI::ajaxheader();
 
-$custom = get_post_custom($post->ID);  
-$cats_to_display = $custom["default-product-meta"][0];
 ?>
 <div id="lh_sidebar">
 	<?php UI::getSidebars();?>
@@ -21,15 +16,10 @@ $cats_to_display = $custom["default-product-meta"][0];
 		</div>
 
 <script> 
-
 	$(document).ready(function(){
-		loadAppropriate();
+		ajaxLoadAllProducts();
 	});
-function loadAppropriate(){
-	var categories = '<? echo $cats_to_display;?>';
-	console.log("default logged "+categories);
-	ajaxLoadProducts(categories);
-} 
+ 
 var max_container_height;
 /**
  * reposition fullview on resize
@@ -92,17 +82,17 @@ function loadProduct(ID){
 }
 
 
-
+ 
 /**
  * make ajax call to load a series of albums
  */
-function ajaxLoadProducts(categories){
+function ajaxLoadAllProducts(){
 				if(categories!=""){
 					showAjaxLoader();
 					$.ajax({
 			        url:        '<?php echo get_bloginfo('url')?>/wp-admin/admin-ajax.php',
 			        type:       'post',
-			        data:       { "action":"displayProducts", "categories":categories},
+			        data:       { "action":"displayAllProducts"},
 			        success: function(data) {
 			        $("#container").empty();
 			        hideAjaxLoader();
@@ -155,11 +145,16 @@ function setUpFullView(){
 /**
  * remove full view and restore albums
  */
-function restoreProducts(){
-	$("#main div").each(function(){
-		$(this).remove();
+function restoreAlbums(){
+	fullOpen = false;
+	$(".large-item").each(function(){
+			$(this).remove();
 	});
-	$("#main").load('<? global $post; echo get_bloginfo('url')."?page_id=$post->ID";?>', null, hideAjaxLoader); 
+	$("#container div").each(
+		function(){
+			$(this).fadeIn('200');
+		}
+	);
 }			
 
 $(document).ready(function(){
