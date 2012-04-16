@@ -490,6 +490,16 @@ function displayProducts(){
 	foreach($products as $product){
 		$product->makeView();
 	} 
+	?>
+	<script>
+		$("a.default-item-permalink").click(function(e){
+			e.preventDefault();
+			$("#main").empty();
+			showAjaxLoader();
+			loadFromInto($(this), "#main");
+		});
+	</script>
+	<?php
 die();
 }
 add_action('wp_ajax_displayProducts', 'displayProducts');

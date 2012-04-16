@@ -44,74 +44,144 @@
 <!--[if lt IE 9]>
 <script src="<?php echo get_template_directory_uri(); ?>/js/html5.js" type="text/javascript"></script>
 <![endif]-->
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+<script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
 <script src="http://bxslider.com/sites/default/files/jquery.bxSlider.min.js" type="text/javascript"></script>
-<script src="/npr/wp-content/themes/_s_2/js/masonry.js"></script>
+<script src="<?php bloginfo('template_directory'); ?>/js/masonry.js"></script>
+<script src="<?php bloginfo('template_directory'); ?>/js/npr-js.js"></script>
 <script>
 
 	log("Loading header.php");
 	/**
 	 * Debugging function	
 	 */
-	function log(x){
-		console.log(x);
-	}
 	
-	function reloadMasonry(data){ 
-		$('#container').masonry({
-		    // options  
-		    itemSelector : ".item-wrapper" , 
-		    singleMode: true,
-		    isAnimated: true
-		  });
-		$("#container").append(data);//.masonry( 'appended', data , true);
-		
-		$.when($("#container").masonry('reload')).then($(".item-wrapper").animate( {opacity:1}, 500 ));
-		addToBodyClass("black"); 
-	}	 	 
-	/**
-	 * add a class to page to help indentify via ajax
-	 */
-	function addToBodyClass(theClass){
-		log("addToBody");
-		$("body").removeClass(); //remove all
-		$("body").addClass(theClass);
-	}
-	jQuery(document).ready(function(){ 
-		jQuery("body").append("<div id='ajaxloaderdiv'></div>");//create the ajax loader
-	});
-
-	function showAjaxLoader(){
-		jQuery("#ajaxloaderdiv").show();
-	}
-	function hideAjaxLoader(){
-		jQuery("#ajaxloaderdiv").hide();
-	}
-	jQuery("#ajaxloaderdiv").click(function(){
-		hideAjaxLoader();
-	});	
-	
-	function removeCurrentClass(){
-	var elems = new Array("#artist-tax li a","#genre-tax li a","#category-tax li a");
-	var i = 0;
-	for(i = 0 ; i < elems.length ; i ++ )
-	jQuery(elems[i]).each(function(){
-		jQuery(this).removeClass("current");
-	});
-	}
 </script>
 <?php wp_head(); 
 Prefs::getStyles();?>
-</head> 
-
+<!-- override admin bar margin --> 
+<style type='text/css'>
+html {
+margin-top: 0px !important;
+}
+</style>
+</head>
 <body <?php body_class(); ?>>
 <!-- handle the window/tab close and delete cookie -->
 <script>
-  window.onbeforeunload = function (e) {
+function log(x) {
+	console.log(x);
+}
+
+function reloadMasonry(data) {
+	console.log("Reloading masonry data ");
+	$('#container').masonry({
+		// options
+		itemSelector : ".item-wrapper",
+		singleMode : true,
+		isAnimated : true
+	});
+	$("#container").append(data);
+	//.masonry( 'appended', data , true);
+	$("#container").masonry('reload');
+	$.when($("#container").masonry('reload')).then($(".item-wrapper").animate({
+		opacity : 1
+	}, 500));
+	addToBodyClass("black");
+}
+
+/**
+ * add a class to page to help indentify via ajax
+ */
+function addToBodyClass(theClass) {
+	log("addToBody");
+	$("body").removeClass();
+	//remove all
+	$("body").addClass(theClass);
+}
+
+
+$(document).ready(function() {
+	$("body").append("<div id='ajaxloaderdiv'></div>");
+	//create the ajax loader
+	$(".menu-item a").click(function(event) {
+		event.preventDefault();
+		stripCurrentClasses();
+		jQuery(this).parent().addClass("current_page_item ");
+		loadFromInto(jQuery(this), "#main");
+	});
+});
+function showAjaxLoader() {
+	jQuery("#ajaxloaderdiv").show();
+}
+
+function hideAjaxLoader() {
+	jQuery("#ajaxloaderdiv").hide();
+}
+
+
+jQuery("#ajaxloaderdiv").click(function() {
+	hideAjaxLoader();
+});
+function removeCurrentClass() {
+	var elems = new Array("#artist-tax li a", "#genre-tax li a", "#category-tax li a");
+	var i = 0;
+	for( i = 0; i < elems.length; i++)
+	jQuery(elems[i]).each(function() {
+		jQuery(this).removeClass("current");
+	});
+}
+
+/**
+ * comment scripts
+ */
+$("#commentform").submit(function(event) {
+	event.preventDefault();
+	alert("Clicked submit");
+});
+/**
+ * function for loading the href off an element into the passed target div
+ */
+function loadFromInto(fromElem, intoElem) {
+	console.log("Load from into called...");
+	var from = jQuery(fromElem);
+	var into = jQuery(intoElem);
+	var href = from.attr("href");
+	var title = from.attr("title");
+	addToBodyClass(title);
+	//set body class to the menu item name
+	showAjaxLoader();
+	location.hash = from.text();
+	into.load(href, null, hideAjaxLoader);
+	into.scrollTop();
+}
+
+
+ 
+/**
+ * make the top nav appear to change
+ */
+function setCurrentMenu(text) {
+	stripCurrentClasses();
+	$(".menu-item a").each(function() {
+		if($(this).text() == text)
+			$(this).addClass("current_page_item");
+		else
+			$(this).removeClass("current_page_item");
+	});
+}
+
+function stripCurrentClasses() {
+	jQuery(".menu li").each(function() {
+		jQuery(this).removeClass("current_page_item");
+		jQuery(this).removeClass("current-menu-item ");
+	});
+}
+window.onbeforeunload = function (e) {
         e = e || window.event;
         document.cookie = "ajax_is_on" + '=; expires=Thu, 01-Jan-70 00:00:01 GMT;';
         console.log("Deleting cookie");
     };
+
 </script>
 <div id="page" class="hfeed site">
 	<?php do_action( 'before' ); ?>
@@ -136,57 +206,7 @@ Prefs::getStyles();?>
 
 			<?php wp_nav_menu( ); ?>
 		</nav>
-<script>
 
-	/**
-	 * comment scripts
-	 */
-	$("#commentform").submit(function(event){
-		event.preventDefault();
-		alert("Clicked submit");
-	});
-	/**  
-	 * function for loading the href off an element into the passed target div
-	 */
-	function loadFromInto(fromElem, intoElem){
-		var from = jQuery(fromElem); 
-		var into = jQuery(intoElem);
-		var href = from.attr("href");
-		var title = from.attr("title");
-		addToBodyClass(title); //set body class to the menu item name
-	  	showAjaxLoader();
-	  	location.hash = title;
-	  	into.load(href, null, hideAjaxLoader); 
-	}
-
-	   
-	jQuery(".menu-item a").click(function(event) {
-	  event.preventDefault();
-	  stripCurrentClasses();
-	  jQuery(this).parent().addClass("current_page_item ");
-	  loadFromInto(jQuery(this),"#main");
-	});
-	/**
-	 * make the top nav appear to change
-	 */
-	function setCurrentMenu(text){
-		stripCurrentClasses();
-		$(".menu-item a").each(function(){
-			if($(this).text()==text)
-				$(this).addClass("current_page_item");
-			else
-				$(this).removeClass("current_page_item");
-		});
-	}
-	
-	function stripCurrentClasses(){
-		jQuery(".menu li").each(function(){
-			jQuery(this).removeClass("current_page_item");
-			jQuery(this).removeClass("current-menu-item ");
-		});
-	}
-
-</script>
 	</header><!-- #masthead .site-header -->
 
 	<div id="main">

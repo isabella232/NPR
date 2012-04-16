@@ -19,7 +19,7 @@ class nprproduct{
 	public function makeView(){
 		$buynow = CartHelper::getBuyNow($this->ID);
 				echo "
-			<div class='item-wrapper default-item-wrapper' id='$this->domID'>
+			<div class='item-wrapper default-item-wrapper' id='$this->ID'>
 			<div id='$this->ID' class='sm-item item default-item'>
 			<div class='inner'>
 			<div class='content'>
@@ -32,6 +32,31 @@ class nprproduct{
 		echo "</div>
 			  </div>
 		      </div>";
+		$this->getScripts();
+	}
+	public function getScripts(){
+		?>
+		<!-- script added by nprproductclass.php -->
+		<script>
+			/**
+			 * Click listeners
+			 */
+			$("#<?php echo $this->ID;?> a").click(function(event){
+				event.preventDefault();
+				hideOtherProducts(<?php echo $this->ID; ?>, this);
+			});
+		</script>
+		<?php
+	}
+	/**
+	 * show the expanded view
+	 */
+	public function showLarge(){
+		echo "
+		<div class='default-full-view' id='$this->ID'>
+		
+		</div>
+		";
 	}
 }
 ?>

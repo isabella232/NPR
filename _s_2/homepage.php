@@ -32,8 +32,9 @@ UI::ajaxheader(); ?>
 <script src="/npr/wp-content/themes/_s_2/js/masonry.js"></script>
 <script>  
 $(window).resize(function(){
-	stretchSliders(); 
+	stretchSliders();
 });
+
 $(document).ready(function(){
 	fadeInItems();
 	$("#albums-slider").bxSlider({

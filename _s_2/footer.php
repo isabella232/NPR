@@ -91,4 +91,4 @@ function updatePlayer(name, artist, guid){
 
 </script>
 </body>
-</html>
+</html> 

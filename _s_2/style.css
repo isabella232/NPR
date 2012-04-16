@@ -1,9 +1,9 @@
 /*
- Theme Name: The NPR Project _S
+Theme Name: The NPR Project _S
 
- Author: Jack & Instinct
-
- */
+Author: Instinct Inc. 
+Description: This is the alpha test of an NPR inspired AJAX WPEC music theme. REQUIRES WORDPRESS ECOMMERCE PLUGIN. Please see the README.txt for instruction as it requires creation of certain post categories to funciton correctly.
+*/
 
 /* =Reset
  -------------------------------------------------------------- */
@@ -1159,6 +1159,15 @@ h1.homepage-indent {
 .large-item {
 	position: relative;
 }
+.close {
+	position: absolute;
+	top: -90px;
+	right: -30px;
+	width: 50px;
+	height: 50px;
+	background: transparent url('res/close.png') no-repeat center center;
+	cursor: pointer;
+}
 .large-item .close {
 	position: absolute;
 	top: -22px;
@@ -1399,6 +1408,7 @@ body.wpsc-shopping-cart #colophon, body.wpsc-shopping-cart #masthead {
 #wpadminbar {
 	display: none;
 }
+body input[type=submit],
 body .wpsc_buy_button {
 	-moz-box-shadow: inset 0px 1px 0px 0px #fab3ad;
 	-webkit-box-shadow: inset 0px 1px 0px 0px #fab3ad;
@@ -1420,12 +1430,14 @@ body .wpsc_buy_button {
 	text-decoration: none;
 	text-shadow: 1px 1px 0px #98231a;
 }
+body input[type=submit]:hover,
 body .wpsc_buy_button:hover {
 	background: -webkit-gradient( linear, left top, left bottom, color-stop(0.05, #d34639), color-stop(1, #fa665a) );
 	background: -moz-linear-gradient( center top, #d34639 5%, #fa665a 100% );
 	filter: progid :DXImageTransform.Microsoft.gradient(startColorstr='#d34639', endColorstr='#fa665a');
 	background-color: #d34639;
 }
+body input[type=submit]:active,
 body .wpsc_buy_button:active {
 	position: relative;
 	top: 1px;
@@ -1473,4 +1485,24 @@ margin-bottom: 15px;
 
 .default-item .inner{
 	text-align: center;
+}
+#lh_sidebar {
+overflow-y: auto;
+}
+.widget {
+padding: 10px;
+}
+#single-post .type-wpsc-product {
+background: #EEE;
+padding: 10px;
+border-radius: 7px;
+display:inline-block;
+box-shadow: 0px 2px 4px rgba(0,0,0,0.3);
+}
+#wpsc_checkout_form_9 {
+top: 0px;
+vertical-align: top;
+}
+.wpsc_checkout_form_9 {
+display: inline;
 }

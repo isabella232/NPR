@@ -9,12 +9,11 @@ $custom = get_post_custom($post->ID);
 $cats_to_display = $custom["default-product-meta"][0];
 ?>
 <div id="lh_sidebar">
-	<?php UI::getSidebars();?>
 	<ul>
 	</ul>
 		
 </div>
-<div id="container">
+<div id="container" class="default_products">
 	 
 		<div class="product_grid_display group">
 		
@@ -22,14 +21,15 @@ $cats_to_display = $custom["default-product-meta"][0];
 
 <script> 
 
-	$(document).ready(function(){
-		loadAppropriate();
-	});
+$(document).ready(function(){
+	loadAppropriate();
+});
 function loadAppropriate(){
 	var categories = '<? echo $cats_to_display;?>';
 	console.log("default logged "+categories);
 	ajaxLoadProducts(categories);
 } 
+ 
 var max_container_height;
 /**
  * reposition fullview on resize
@@ -44,6 +44,7 @@ var fullOpen = false;
  * hide other products
  */
 function hideOtherProducts(id, fromElem){
+	console.log("hideOtherProducts");
 	$(".item-wrapper").each(function(){
 	$(this).remove();
 	});
